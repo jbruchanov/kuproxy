@@ -1,0 +1,4 @@
+rootProject.name = 'kuproxy'
+
+include ':common'
+include ':app-console'

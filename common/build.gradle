@@ -1,0 +1,5 @@
+apply from: "$rootProject.projectDir/build-java-lib.gradle"
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib"
+}

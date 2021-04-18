@@ -1,0 +1,30 @@
+apply plugin: 'java-library'
+apply plugin: 'kotlin'
+apply from: "$rootProject.projectDir/build-ktlint.gradle"
+
+group 'com.scurab.kuproxy'
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin"
+    implementation "org.junit.jupiter:junit-jupiter:$junit"
+}
+
+configurations {
+    testArtifacts
+}
+
+task testJar(type: Jar) {
+    group = "verification"
+    archiveBaseName = "${project.name}-test"
+    include "test/**"
+    include "META-INF/**"
+    from sourceSets.test.output
+}
+artifacts {
+    testArtifacts testJar
+}
+
+test {
+    // enable JUnit Platform (a.k.a. JUnit 5) support
+    useJUnitPlatform()
+}
