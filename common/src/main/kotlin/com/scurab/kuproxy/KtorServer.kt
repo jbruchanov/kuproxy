@@ -20,6 +20,8 @@ class KtorServer(private val ktorConfig: KtorConfig) {
     val isRunning get() = server != null
 
     fun start() {
+        if (server != null) return
+
         server = embeddedServer(
             Netty,
             applicationEngineEnvironment {
