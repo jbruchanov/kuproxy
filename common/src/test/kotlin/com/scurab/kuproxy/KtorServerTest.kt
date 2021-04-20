@@ -2,12 +2,14 @@ package com.scurab.kuproxy
 
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import test.SslHelper
 
 internal class KtorServerTest {
 
     @Test
+    @Disabled("manual")
     fun testKtorServer() {
         // turn off any logging
         // (LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger).level = Level.OFF
