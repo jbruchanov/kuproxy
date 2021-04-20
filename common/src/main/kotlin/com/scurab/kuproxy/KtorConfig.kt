@@ -1,5 +1,6 @@
 package com.scurab.kuproxy
 
+import com.scurab.kuproxy.properties.ipPort
 import java.security.KeyStore
 import kotlin.properties.Delegates
 
@@ -17,15 +18,8 @@ interface KtorConfig {
 }
 
 class KtorConfigBuilder : KtorConfig {
-
-    override var httpPort: Int by Delegates.observable(58880) { _, _, newValue ->
-        require(newValue in (1..65535)) { "Port must be in range of [1 .. 65535], was $newValue" }
-    }
-
-    override var httpsPort: Int by Delegates.observable(58888) { _, _, newValue ->
-        require(newValue in (1..65535)) { "Port must be in range of [1 .. 65535], was $newValue" }
-    }
-
+    override var httpPort: Int by ipPort(58880)
+    override var httpsPort: Int by ipPort(58888)
     override var keyStore: KeyStore by Delegates.notNull()
     override var keyStorePassword: CharArray = EMPTY_PWD
     override var keyAlias: String = "_KuProxyServer"
