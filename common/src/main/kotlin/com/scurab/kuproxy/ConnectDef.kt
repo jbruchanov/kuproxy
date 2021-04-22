@@ -1,6 +1,6 @@
 package com.scurab.kuproxy
 
-import com.scurab.kuproxy.util.StringColors
+import com.scurab.kuproxy.util.AnsiEffect
 import java.net.URI
 
 data class ConnectDef(val method: String, val url: String, val port: Int, val httpVersion: String) {
@@ -8,11 +8,12 @@ data class ConnectDef(val method: String, val url: String, val port: Int, val ht
 
     fun toLogString(): String {
         return if (isSsl) {
-            StringColors.apply("SSL $url:$port", StringColors.AnsiEffect.TextYellow)
+            AnsiEffect.TextYellow("SSL $url:$port")
         } else {
-            StringColors.apply("TXT $url:$port", StringColors.AnsiEffect.TextGray)
+            AnsiEffect.TextGray("TXT $url:$port")
         }
     }
+
     companion object {
         const val CONNECT = "CONNECT"
 
