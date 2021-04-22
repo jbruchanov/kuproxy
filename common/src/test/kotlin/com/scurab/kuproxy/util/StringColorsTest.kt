@@ -8,7 +8,7 @@ internal class StringColorsTest {
     @Test
     @Disabled("manual")
     fun test() {
-        StringColors.AnsiEffect.values().forEach {
+        AnsiEffect.values().forEach {
             println(StringColors.apply(it.name, it))
         }
     }
