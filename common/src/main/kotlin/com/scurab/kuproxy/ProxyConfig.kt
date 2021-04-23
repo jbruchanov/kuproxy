@@ -17,7 +17,7 @@ interface ProxyConfig {
 
 class ProxyConfigBuilder : ProxyConfig {
     override var port: Int by ipPort(8888)
-    override var httpServerPort: Int by ipPort(8888)
-    override var httpsServerPort: Int by ipPort(8888)
+    override var httpServerPort: Int by ipPort(58880)
+    override var httpsServerPort: Int by ipPort(58888)
     override var domains: List<Regex> = emptyList()
 }
