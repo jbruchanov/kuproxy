@@ -1,5 +1,6 @@
 package com.scurab.kuproxy
 
+import com.scurab.ssl.CertificateFactory
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Disabled
@@ -10,23 +11,20 @@ internal class KtorServerTest {
 
     @Test
     @Disabled("manual")
-    fun testKtorServer() {
+    fun testKtorServer() = runBlocking {
         // turn off any logging
         // (LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger).level = Level.OFF
 
+        val serverCertsKeyStore =
+            SslHelper.createServerCertSignedByCA(CertificateFactory.embeddedCACertificate, listOf("localhost"))
         val config = KtorConfig {
             httpPort = 8080
             httpsPort = 8088
-            keyStore = SslHelper.createServerCertSignedByCA()
+            keyStore = serverCertsKeyStore
             keyAlias = SslHelper.ServerAlias
         }
 
-        KtorServer(config).also {
-            it.start()
-            runBlocking {
-                delay(60000)
-                it.stop()
-            }
-        }
+        KtorServer(config).start()
+        delay(120000 * 20)
     }
 }

@@ -4,6 +4,7 @@ import com.scurab.kuproxy.ext.closeQuietly
 import com.scurab.kuproxy.ext.copyInto
 import com.scurab.kuproxy.ext.readUntil
 import com.scurab.kuproxy.ext.readUntilDoubleCrLf
+import com.scurab.kuproxy.util.AnsiEffect
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
@@ -86,7 +87,13 @@ class ProxyServer(private val config: ProxyConfig) {
             return
         }
 
-        println(def.toLogString())
+        val isProxying = serverSocket.inetAddress.isLoopbackAddress
+        val log = when {
+            isProxying && def.isSsl -> AnsiEffect.TextYellow(def.toLogString())
+            isProxying -> AnsiEffect.TextGreen(def.toLogString())
+            else -> AnsiEffect.TextDarkGray(def.toLogString())
+        }
+        println(log)
 
         if (def.isSsl) {
             istream.readUntilDoubleCrLf(keepPosition = true)

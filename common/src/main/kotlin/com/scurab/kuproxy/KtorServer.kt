@@ -1,14 +1,18 @@
 package com.scurab.kuproxy
 
+import com.scurab.kuproxy.ext.proxy
 import io.ktor.application.ApplicationCallPipeline
 import io.ktor.application.call
-import io.ktor.response.respond
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.cio.CIO
 import io.ktor.server.engine.ApplicationEngine
 import io.ktor.server.engine.applicationEngineEnvironment
 import io.ktor.server.engine.connector
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.engine.sslConnector
 import io.ktor.server.netty.Netty
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
  * Internal server for http processing
@@ -18,6 +22,10 @@ class KtorServer(private val ktorConfig: KtorConfig) {
     private var server: ApplicationEngine? = null
 
     val isRunning get() = server != null
+
+    val client = HttpClient(CIO) {
+        expectSuccess = false
+    }
 
     fun start() {
         if (server != null) return
@@ -40,7 +48,9 @@ class KtorServer(private val ktorConfig: KtorConfig) {
 
                 module {
                     intercept(ApplicationCallPipeline.Call) {
-                        call.respond("Test")
+                        withContext(Dispatchers.IO) {
+                            call.proxy(client)
+                        }
                     }
                 }
             }

@@ -1,24 +1,39 @@
 package com.scurab.kuproxy
 
+import ch.qos.logback.classic.Level
+import ch.qos.logback.classic.Logger
+import com.scurab.ssl.CertificateFactory
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import org.slf4j.LoggerFactory
 import test.SslHelper
 
 internal class ProxyServerTest {
 
+    val domains = listOf("localhost", "zunpa.cz", "scurab.com", "*.scurab.com", "cdr.cz", "*.cdr.cz")
+    val domainsRegexps = domains.map {
+        ("\\Q$it\\E").replace("*", "\\E.*\\Q").toRegex()
+    }
+
     @Test
     @Disabled("manual")
     fun test() = runBlocking {
+        (LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger).level = Level.OFF
+
+        val serverCertsKeyStore =
+            SslHelper.createServerCertSignedByCA(CertificateFactory.embeddedCACertificate, domains)
+
         val ktorConfig = KtorConfig {
-            keyStore = SslHelper.createServerCertSignedByCA()
+            keyStore = serverCertsKeyStore
             keyAlias = SslHelper.ServerAlias
         }
         KtorServer(ktorConfig).start()
         val proxyConfig = ProxyConfig {
             httpServerPort = ktorConfig.httpPort
-            httpServerPort = ktorConfig.httpsPort
+            httpsServerPort = ktorConfig.httpsPort
+            domains = domainsRegexps
         }
         ProxyServer(proxyConfig).start()
 
