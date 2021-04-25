@@ -7,6 +7,8 @@ group 'com.scurab.kuproxy'
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin"
     implementation "org.junit.jupiter:junit-jupiter:$junit"
+    testImplementation "io.mockk:mockk:$mockk"
+
 }
 
 configurations {
