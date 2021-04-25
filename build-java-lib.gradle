@@ -27,4 +27,11 @@ artifacts {
 test {
     // enable JUnit Platform (a.k.a. JUnit 5) support
     useJUnitPlatform()
+
+    testLogging {
+        showStandardStreams = true
+    }
+
+    //https://github.com/junit-team/junit5/issues/1774#issuecomment-463662553
+    systemProperty 'java.util.logging.config.file', "${project.buildDir}/resources/test/logging-test.properties"
 }
