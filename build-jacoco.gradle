@@ -1,0 +1,12 @@
+//https://github.com/vanniktech/gradle-android-junit-jacoco-plugin
+apply plugin: "com.vanniktech.android.junit.jacoco"
+
+junitJacoco {
+    jacocoVersion = jacoco
+    ignoreProjects = []
+    excludes = [
+            '**/test/*',
+    ]
+    includeNoLocationClasses = true
+    includeInstrumentationCoverageInMergedReport = false
+}

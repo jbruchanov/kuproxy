@@ -13,4 +13,5 @@ dependencies {
     implementation "io.ktor:ktor-server-netty:$ktor"
     implementation "io.ktor:ktor-network-tls-certificates:$ktor"
     implementation "ch.qos.logback:logback-classic:$logback"
+    testImplementation "io.ktor:ktor-server-test-host:$ktor"
 }

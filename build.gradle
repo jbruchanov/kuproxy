@@ -12,8 +12,11 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin"
         classpath "org.jetbrains.dokka:dokka-gradle-plugin:$dokka"
         classpath "org.jlleitschuh.gradle:ktlint-gradle:$ktLintPlugin"
+        classpath "com.vanniktech:gradle-android-junit-jacoco-plugin:$jacocoPlugin"
     }
 }
+
+apply from: "$rootProject.projectDir/build-jacoco.gradle"
 
 allprojects {
     repositories {

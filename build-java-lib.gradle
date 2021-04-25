@@ -7,11 +7,21 @@ group 'com.scurab.kuproxy'
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin"
     implementation "org.junit.jupiter:junit-jupiter:$junit"
+    testImplementation "io.mockk:mockk:$mockk"
+
 }
 
 configurations {
     testArtifacts
 }
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
 
 task testJar(type: Jar) {
     group = "verification"
@@ -27,4 +37,11 @@ artifacts {
 test {
     // enable JUnit Platform (a.k.a. JUnit 5) support
     useJUnitPlatform()
+
+    testLogging {
+        showStandardStreams = true
+    }
+
+    //https://github.com/junit-team/junit5/issues/1774#issuecomment-463662553
+    systemProperty 'java.util.logging.config.file', "${project.buildDir}/resources/test/logging-test.properties"
 }
