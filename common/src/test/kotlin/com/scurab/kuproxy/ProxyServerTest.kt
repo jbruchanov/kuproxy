@@ -2,7 +2,10 @@ package com.scurab.kuproxy
 
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
+import com.scurab.kuproxy.processor.PassThroughProcessor
 import com.scurab.ssl.CertificateFactory
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.cio.CIO
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Disabled
@@ -29,7 +32,11 @@ internal class ProxyServerTest {
             keyStore = serverCertsKeyStore
             keyAlias = SslHelper.ServerAlias
         }
-        KtorServer(ktorConfig).start()
+
+        val client = HttpClient(CIO) { expectSuccess = false }
+        val processor = PassThroughProcessor(client)
+
+        KtorServer(ktorConfig, processor).start()
         val proxyConfig = ProxyConfig {
             httpServerPort = ktorConfig.httpPort
             httpsServerPort = ktorConfig.httpsPort

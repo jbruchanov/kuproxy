@@ -1,5 +1,6 @@
 package com.scurab.kuproxy
 
+import com.scurab.kuproxy.processor.PassThroughProcessor
 import com.scurab.ssl.CertificateFactory
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -24,7 +25,7 @@ internal class KtorServerTest {
             keyAlias = SslHelper.ServerAlias
         }
 
-        KtorServer(config).start()
+        KtorServer(config, PassThroughProcessor()).start()
         delay(120000 * 20)
     }
 }

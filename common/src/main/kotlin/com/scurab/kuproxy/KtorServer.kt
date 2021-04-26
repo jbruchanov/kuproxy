@@ -1,6 +1,6 @@
 package com.scurab.kuproxy
 
-import com.scurab.kuproxy.ext.proxy
+import com.scurab.kuproxy.processor.KtorProcessor
 import io.ktor.application.ApplicationCallPipeline
 import io.ktor.application.call
 import io.ktor.client.HttpClient
@@ -17,7 +17,10 @@ import kotlinx.coroutines.withContext
 /**
  * Internal server for http processing
  */
-class KtorServer(private val ktorConfig: KtorConfig) {
+class KtorServer(
+    private val ktorConfig: KtorConfig,
+    private val processor: KtorProcessor
+) {
 
     private var server: ApplicationEngine? = null
 
@@ -49,7 +52,7 @@ class KtorServer(private val ktorConfig: KtorConfig) {
                 module {
                     intercept(ApplicationCallPipeline.Call) {
                         withContext(Dispatchers.IO) {
-                            call.proxy(client)
+                            processor.process(call)
                         }
                     }
                 }
