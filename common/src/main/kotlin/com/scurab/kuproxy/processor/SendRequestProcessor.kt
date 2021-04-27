@@ -36,17 +36,17 @@ interface SendRequestProcessor {
                     request.headers.forEach { (header, values) ->
                         when {
                             // TODO: 443 replace
-                            header == "Host" -> append(header, values.first().replace(":443", ""))
+                            header == "Host" -> append(header, values.replace(":443", ""))
                             IGNORED_HEADERS.contains(header.toLowerCase()) -> {
                                 /*nothing*/
                             }
-                            else -> appendAll(header, values)
+                            else -> append(header, values)
                         }
                     }
                 }
                 val contentType = request.headers.entries
                     .firstOrNull { it.key.equals(CONTENT_TYPE, ignoreCase = true) }
-                    ?.let { ContentType.parse(it.value.first()) }
+                    ?.let { ContentType.parse(it.value) }
 
                 body = requestBody.takeIf { it.isNotEmpty() }
                     ?.let { ByteArrayContent(it, contentType = contentType) }

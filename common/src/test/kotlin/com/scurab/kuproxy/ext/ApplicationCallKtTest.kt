@@ -28,8 +28,8 @@ internal class ApplicationCallKtTest {
                 url = Url("http://www.test.com")
                 method = "DELETE"
                 headers = mapOf(
-                    "Header1" to setOf("a", "b"),
-                    "Header2" to setOf("c"),
+                    "Header1" to "a; b",
+                    "Header2" to "c",
                 )
             }
             assertEquals(expectedRequest.url, domainRequest.url)

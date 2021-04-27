@@ -31,6 +31,7 @@ class SendRequestProcessorTest {
     fun Application.testCaseSetup() {
         intercept(ApplicationCallPipeline.Call) {
             call.response.headers.append("Header1", "Value1")
+            call.response.headers.append("Header2", "Value2a; Value2b")
             call.respondBytes(
                 "TestBody".toByteArray(),
                 contentType = ContentType.parse("plain/text"),
@@ -45,10 +46,11 @@ class SendRequestProcessorTest {
     private val testContentType = "application/test"
     private val testReqHeaders = listOf(
         "Header1" to "Value1",
+        "Header2" to "Value2a; Value2b",
         CONTENT_TYPE to testContentType
     )
     private val testRespBody = "Response123".toByteArray()
-    private val testRespHeaders = listOf("Header2" to "Value2")
+    private val testRespHeaders = listOf("Header3" to "Value3")
     private val testRespCode = HttpStatusCode.Accepted
 
     //TODO: more tests for header Host
@@ -68,7 +70,7 @@ class SendRequestProcessorTest {
             assertEquals(testRespCode.value, response.status)
             testRespHeaders.forEach { (k, v) ->
                 assertTrue(response.headers.containsKey(k))
-                assertEquals(response.headers[k], setOf(v))
+                assertEquals(response.headers[k], v)
             }
             assertArrayEquals(testRespBody, response.body)
         }

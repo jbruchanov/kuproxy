@@ -49,12 +49,12 @@ internal class DefaultRequestMatcherTest {
                 request {
                     url = Url("http://www.test.com")
                     method = GET
-                    headers = mapOf(ContentType to setOf("a", "b"), AcceptEncoding to setOf("c"))
+                    headers = mapOf(ContentType to "a; b", AcceptEncoding to "c")
                 },
                 request {
                     url = Url("http://www.test.com")
                     method = GET
-                    headers = mapOf(ContentType to setOf("a", "b"))
+                    headers = mapOf(ContentType to "a; b")
                 }
             ),
             Arguments.of(
@@ -62,7 +62,7 @@ internal class DefaultRequestMatcherTest {
                 request {
                     url = Url("http://www.test.com")
                     method = GET
-                    headers = mapOf(ContentType to setOf("a", "b"), AcceptEncoding to setOf("c"))
+                    headers = mapOf(ContentType to "a; b", AcceptEncoding to "c")
                 },
                 request {
                     url = Url("http://www.test.com")
@@ -74,12 +74,12 @@ internal class DefaultRequestMatcherTest {
                 request {
                     url = Url("http://www.test.com")
                     method = GET
-                    headers = mapOf(ContentType to setOf("a", "b"), AcceptEncoding to setOf("c"))
+                    headers = mapOf(ContentType to "a; b", AcceptEncoding to "c")
                 },
                 request {
                     url = Url("http://www.test.com")
                     method = GET
-                    headers = mapOf(ContentType to setOf("a", "c"), AcceptEncoding to setOf("b"))
+                    headers = mapOf(ContentType to "a; c", AcceptEncoding to "b")
                 }
             )
         ).stream()

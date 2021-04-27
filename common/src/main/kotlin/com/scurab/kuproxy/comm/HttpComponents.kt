@@ -1,6 +1,6 @@
 package com.scurab.kuproxy.comm
 
-typealias Headers = Map<String, Set<String>>
+typealias Headers = Map<String, String>
 
 interface IRequest {
     val url: Url
