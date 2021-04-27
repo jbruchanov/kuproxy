@@ -1,6 +1,8 @@
-package com.scurab.kuproxy.comm
+package com.scurab.kuproxy.matcher
 
-import org.junit.jupiter.api.Assertions.assertEquals
+import com.scurab.kuproxy.comm.IRequest
+import com.scurab.kuproxy.comm.Url
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -15,7 +17,7 @@ internal class DefaultRequestMatcherTest {
     @ParameterizedTest(name = "{0}")
     @ArgumentsSource(Args::class)
     fun match(@Suppress("UNUSED_PARAMETER") name: String, equals: Boolean, real: IRequest, stored: IRequest) {
-        assertEquals(equals, matcher.isMatching(real, stored))
+        Assertions.assertEquals(equals, matcher.isMatching(real, stored))
     }
 
     class Args : ArgumentsProvider {
