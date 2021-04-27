@@ -8,8 +8,11 @@ import io.mockk.mockk
 import io.mockk.spyk
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import test.junit.SilentLogsExtension
 import test.testRequest
 
+@ExtendWith(SilentLogsExtension::class)
 internal class PassThroughProcessorTest {
 
     @Test

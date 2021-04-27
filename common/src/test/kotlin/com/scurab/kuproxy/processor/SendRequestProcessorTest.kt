@@ -23,8 +23,9 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import test.createTestRequest
+import test.junit.SilentLogsExtension
 
-@ExtendWith(MockKExtension::class)
+@ExtendWith(value = [MockKExtension::class, SilentLogsExtension::class])
 class SendRequestProcessorTest {
 
     fun Application.testCaseSetup() {

@@ -14,7 +14,7 @@ internal class DefaultRequestMatcherTest {
 
     @ParameterizedTest(name = "{0}")
     @ArgumentsSource(Args::class)
-    fun match(name: String, equals: Boolean, real: IRequest, stored: IRequest) {
+    fun match(@Suppress("UNUSED_PARAMETER") name: String, equals: Boolean, real: IRequest, stored: IRequest) {
         assertEquals(equals, matcher.isMatching(real, stored))
     }
 

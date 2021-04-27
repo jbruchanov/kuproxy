@@ -4,9 +4,12 @@ import com.scurab.kuproxy.comm.Url
 import io.ktor.server.testing.withTestApplication
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import test.junit.SilentLogsExtension
 import test.request
 import test.testRequest
 
+@ExtendWith(SilentLogsExtension::class)
 internal class ApplicationCallKtTest {
 
     @Test

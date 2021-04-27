@@ -19,9 +19,10 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import test.junit.SilentLogsExtension
 import test.testRequest
 
-@ExtendWith(MockKExtension::class)
+@ExtendWith(value = [MockKExtension::class, SilentLogsExtension::class])
 internal class SavingProcessorTest {
 
     @RelaxedMockK

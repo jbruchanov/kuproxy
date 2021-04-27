@@ -19,9 +19,10 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import test.junit.SilentLogsExtension
 import test.testRequest
 
-@ExtendWith(MockKExtension::class)
+@ExtendWith(value = [MockKExtension::class, SilentLogsExtension::class])
 internal class ReplayProcessorTest {
 
     @RelaxedMockK
@@ -46,7 +47,7 @@ internal class ReplayProcessorTest {
     fun `process When request match found in repo Then returns as response`() {
         withTestApplication {
             val testRequest = testRequest()
-
+            println()
             every { repo.find(testRequest.toDomainRequest()) } returns response
             mockkStatic("com.scurab.kuproxy.ext.ApplicationCallKt")
             coEvery { testRequest.respond(any(), any()) } returns mockk()
