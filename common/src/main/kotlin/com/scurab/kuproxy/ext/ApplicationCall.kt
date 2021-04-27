@@ -29,10 +29,8 @@ fun ApplicationCall.toDomainRequest(): IRequest {
 suspend fun ApplicationCall.respond(domainResponse: IResponse, block: ApplicationCall.() -> Unit = {}) {
     val realResponse = this.response
     realResponse.status(HttpStatusCode.fromValue(domainResponse.status))
-    domainResponse.headers.forEach { (headerName, headerValues) ->
-        headerValues.forEach { headerValue ->
-            realResponse.headers.append(headerName, headerValue, safeOnly = false)
-        }
+    domainResponse.headers.forEach { (headerName, headerValue) ->
+        realResponse.headers.append(headerName, headerValue, safeOnly = false)
     }
     apply(block)
     this.respond(domainResponse.body)
