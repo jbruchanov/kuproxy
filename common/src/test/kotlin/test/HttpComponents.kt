@@ -1,11 +1,11 @@
 package test
 
 import com.scurab.kuproxy.comm.DomainHeaders
+import com.scurab.kuproxy.comm.Headers
 import com.scurab.kuproxy.comm.IRequest
 import com.scurab.kuproxy.comm.Request
 import com.scurab.kuproxy.comm.Response
 import com.scurab.kuproxy.comm.Url
-import com.scurab.kuproxy.processor.SendRequestProcessor.Companion.CONTENT_TYPE
 import io.ktor.http.HttpMethod
 import io.ktor.server.testing.TestApplicationCall
 import io.ktor.server.testing.TestApplicationEngine
@@ -22,7 +22,7 @@ fun testDomainRequest(
 
 fun testDomainResponse(
     status: Int = 202,
-    headers: DomainHeaders = mapOf("TestResHeader" to "TestResValue", CONTENT_TYPE to "text/plain"),
+    headers: DomainHeaders = mapOf("TestResHeader" to "TestResValue", Headers.ContentType to "text/plain"),
     body: ByteArray = "TestBody".toByteArray()
 ) = Response(status, headers, body)
 
