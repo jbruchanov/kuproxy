@@ -13,8 +13,7 @@ ktlint {
 
 afterEvaluate {
     if (!isAndroid()) {
-        //TODO: enable later
-        //test.dependsOn ktlintCheck
+        test.dependsOn ktlintCheck
     } else {
         project.tasks["testDebugUnitTest"].dependsOn ktlintCheck
         project.tasks["testReleaseUnitTest"].dependsOn ktlintCheck

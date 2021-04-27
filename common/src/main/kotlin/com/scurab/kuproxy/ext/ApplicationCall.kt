@@ -1,60 +1,39 @@
 package com.scurab.kuproxy.ext
 
+import com.scurab.kuproxy.comm.IRequest
+import com.scurab.kuproxy.comm.IResponse
+import com.scurab.kuproxy.comm.Request
+import com.scurab.kuproxy.comm.Url
 import io.ktor.application.ApplicationCall
-import io.ktor.client.HttpClient
 import io.ktor.client.request.headers
 import io.ktor.client.request.request
-import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.readBytes
-import io.ktor.client.utils.EmptyContent
-import io.ktor.http.ContentType
-import io.ktor.http.Url
-import io.ktor.http.content.ByteArrayContent
+import io.ktor.http.HttpStatusCode
 import io.ktor.request.header
 import io.ktor.request.httpMethod
-import io.ktor.request.receiveStream
 import io.ktor.request.uri
-import io.ktor.response.respondBytes
-import java.net.URI
+import io.ktor.response.respond
 
-private val ignoredHeaders = setOf("content-length", "content-type")
-
-suspend fun ApplicationCall.proxy(client: HttpClient) {
-    val header = request.header("host")
+fun ApplicationCall.toDomainRequest(): IRequest {
+    val hostHeader = request.header("host")
     val url = request.uri
         .takeIf { it.startsWith("http") }
-        ?: "https://${header}${request.uri}"
+        ?: "https://${hostHeader}${request.uri}"
 
-    val reqBody = this.receiveStream().readBytes()
-    val destResponse = client.request<HttpResponse>(Url(URI.create(url))) {
-        method = request.httpMethod
-        headers {
-            request.headers.forEach { header, values ->
-                when {
-                    // TODO: 443 replace
-                    header == "Host" -> append(header, values.first().replace(":443", ""))
-                    ignoredHeaders.contains(header.toLowerCase()) -> {
-                        /*nothing*/
-                    }
-                    else -> appendAll(header, values)
-                }
-            }
-        }
-        val contentType = request.header("Content-Type")?.let { ContentType.parse(it) }
-        body = reqBody.takeIf { it.isNotEmpty() }
-            ?.let { ByteArrayContent(it, contentType = contentType) }
-            ?: EmptyContent
-    }
+    return Request(
+        Url(url),
+        request.httpMethod.value,
+        headers = request.headers.toDomainHeaders()
+    )
+}
 
-    response.status(destResponse.status)
-
-    destResponse.headers.forEach { headerName, headerValues ->
+suspend fun ApplicationCall.respond(domainResponse: IResponse, block: ApplicationCall.() -> Unit = {}) {
+    val realResponse = this.response
+    realResponse.status(HttpStatusCode.fromValue(domainResponse.status))
+    domainResponse.headers.forEach { (headerName, headerValues) ->
         headerValues.forEach { headerValue ->
-            response.headers.append(headerName, headerValue, safeOnly = false)
+            realResponse.headers.append(headerName, headerValue, safeOnly = false)
         }
     }
-
-    response.headers.append("Custom-Proxy", "KuProxy")
-    val bytes = destResponse.readBytes()
-    respondBytes(bytes)
+    apply(block)
+    this.respond(domainResponse.body)
 }

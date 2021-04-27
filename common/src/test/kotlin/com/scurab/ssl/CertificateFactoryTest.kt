@@ -86,7 +86,6 @@ internal class CertificateFactoryTest {
             .toString()
 
         assertTrue(cert.isNotEmpty())
-        println(cert)
     }
 
     /**
