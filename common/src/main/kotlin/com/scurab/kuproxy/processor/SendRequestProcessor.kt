@@ -3,6 +3,7 @@ package com.scurab.kuproxy.processor
 import com.scurab.kuproxy.comm.IRequest
 import com.scurab.kuproxy.comm.IResponse
 import com.scurab.kuproxy.comm.Response
+import com.scurab.kuproxy.common.BuildConfig
 import com.scurab.kuproxy.ext.respond
 import com.scurab.kuproxy.ext.toDomainHeaders
 import io.ktor.application.ApplicationCall
@@ -76,7 +77,7 @@ interface SendRequestProcessor {
         private val IGNORED_HEADERS = setOf("content-length", CONTENT_TYPE)
         val AddKuProxyInfoHeader: ProcessingCallback = {
             //TODO:version
-            response.headers.append("KuProxy-Version", "//TODO:version")
+            response.headers.append("KuProxy-Version", BuildConfig.AppVersion)
         }
     }
 }

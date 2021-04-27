@@ -13,6 +13,7 @@ buildscript {
         classpath "org.jetbrains.dokka:dokka-gradle-plugin:$dokka"
         classpath "org.jlleitschuh.gradle:ktlint-gradle:$ktLintPlugin"
         classpath "com.vanniktech:gradle-android-junit-jacoco-plugin:$jacocoPlugin"
+        classpath "com.github.gmazzo:gradle-buildconfig-plugin:$gmazzo"
     }
 }
 

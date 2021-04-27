@@ -12,12 +12,9 @@ ktlint {
 }
 
 afterEvaluate {
-    if (!isAndroid()) {
-        test.dependsOn ktlintCheck
-    } else {
-        project.tasks["testDebugUnitTest"].dependsOn ktlintCheck
-        project.tasks["testReleaseUnitTest"].dependsOn ktlintCheck
-        project.tasks["assembleRelease"].dependsOn ktlintCheck
+    tasks.register("testKtlint") {
+        group = "verification"
+        dependsOn("test", "ktlintCheck")
     }
 }
 
