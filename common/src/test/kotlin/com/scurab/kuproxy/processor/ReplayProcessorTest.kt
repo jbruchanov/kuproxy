@@ -1,14 +1,17 @@
 package com.scurab.kuproxy.processor
 
+import com.scurab.kuproxy.comm.IRequest
 import com.scurab.kuproxy.comm.IResponse
 import com.scurab.kuproxy.ext.respond
 import com.scurab.kuproxy.ext.toDomainRequest
 import com.scurab.kuproxy.storage.Repository
+import com.scurab.kuproxy.storage.RequestResponse
 import io.ktor.client.HttpClient
 import io.ktor.server.testing.withTestApplication
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
+import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit5.MockKExtension
@@ -32,9 +35,13 @@ internal class ReplayProcessorTest {
     lateinit var client: HttpClient
 
     @MockK
+    lateinit var request: IRequest
+    @MockK
     lateinit var response: IResponse
 
     private lateinit var processor: ReplayProcessor
+    @InjectMockKs
+    private lateinit var requestResponse: RequestResponse
 
     @BeforeEach
     fun setUp() {
@@ -48,7 +55,7 @@ internal class ReplayProcessorTest {
         withTestApplication {
             val testRequest = testRequest()
             println()
-            every { repo.find(testRequest.toDomainRequest()) } returns response
+            every { repo.find(testRequest.toDomainRequest()) } returns requestResponse
             mockkStatic("com.scurab.kuproxy.ext.ApplicationCallKt")
             coEvery { testRequest.respond(any(), any()) } returns mockk()
 

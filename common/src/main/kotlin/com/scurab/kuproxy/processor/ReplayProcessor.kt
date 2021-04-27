@@ -14,9 +14,9 @@ open class ReplayProcessor(
 
     override suspend fun process(call: ApplicationCall) {
         val domainRequest = call.toDomainRequest()
-        val storedRequest = repo.find(domainRequest)
-        if (storedRequest != null) {
-            call.respond(storedRequest)
+        val item = repo.find(domainRequest)
+        if (item?.response != null) {
+            call.respond(item.response)
         } else {
             send(call, domainRequest)
         }
