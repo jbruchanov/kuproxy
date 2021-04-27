@@ -47,8 +47,6 @@ class Request(
     override fun toString(): String {
         return "Request(url=$url, method='$method', headers=$headers, recorded=$recorded)"
     }
-
-
 }
 
 class Response(
@@ -79,6 +77,4 @@ class Response(
     override fun toString(): String {
         return "Response(status=$status, headers=$headers, bodyLen=${body.size})"
     }
-
-
 }

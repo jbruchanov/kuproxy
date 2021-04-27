@@ -1,7 +1,6 @@
 package com.scurab.kuproxy.storage
 
 import com.scurab.kuproxy.comm.IRequest
-import com.scurab.kuproxy.comm.IResponse
 import com.scurab.kuproxy.matcher.RequestMatcher
 import com.scurab.kuproxy.model.Tape
 

@@ -14,6 +14,7 @@ import java.util.Date
 
 internal class YamlConverterTest {
 
+    @Suppress("DEPRECATION")
     private val tape = Tape(
         "test",
         interactions = listOf(
@@ -22,8 +23,10 @@ internal class YamlConverterTest {
                     method = "GET",
                     headers = mapOf("K1" to "V1", "K2" to "V2"),
                     recorded = Date(2021 - 1900, 3, 1, 12, 0, 0).time
-                ), testDomainResponse(
-                    body = """
+                ),
+                testDomainResponse(
+                    body =
+                        """
                             <html>
                                 <body>
                                     Test
@@ -72,7 +75,8 @@ internal class YamlConverterTest {
         }
     }
 
-    val expected = """
+    val expected =
+        """
         !<tape>
         name: test
         interactions:

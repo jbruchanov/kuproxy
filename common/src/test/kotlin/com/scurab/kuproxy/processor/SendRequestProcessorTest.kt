@@ -12,7 +12,6 @@ import io.ktor.client.engine.mock.respond
 import io.ktor.content.ByteArrayContent
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.Headers as KtorHeaders
 import io.ktor.response.respondBytes
 import io.ktor.server.testing.withTestApplication
 import io.mockk.junit5.MockKExtension
@@ -24,6 +23,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import test.createTestRequest
 import test.junit.SilentLogsExtension
+import io.ktor.http.Headers as KtorHeaders
 
 @ExtendWith(value = [MockKExtension::class, SilentLogsExtension::class])
 class SendRequestProcessorTest {

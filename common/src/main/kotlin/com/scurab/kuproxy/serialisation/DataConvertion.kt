@@ -136,6 +136,6 @@ open class TapeImportConverter(
     private fun Any.body(): ByteArray = when (this) {
         is String -> toByteArray()
         is ByteArray -> this
-        else -> throw IllegalStateException("Invalid body type:${javaClass}")
+        else -> throw IllegalStateException("Invalid body type:$javaClass")
     }
 }

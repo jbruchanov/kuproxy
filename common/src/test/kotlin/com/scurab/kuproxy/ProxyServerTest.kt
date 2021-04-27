@@ -69,6 +69,7 @@ internal class ProxyServerTest {
             }
             SavingProcessor(repo, client)
         } else {
+            @Suppress("UNCHECKED_CAST")
             val tape = File("saved.yaml").inputStream()
                 .use { Yaml().loadAs(it, Map::class.java) as Map<String, Any> }
                 .let { TapeImportConverter().convert(it) }
