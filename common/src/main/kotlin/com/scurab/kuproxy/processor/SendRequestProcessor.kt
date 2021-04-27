@@ -17,7 +17,6 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpMethod
 import io.ktor.http.content.ByteArrayContent
 import io.ktor.request.receiveStream
-import io.ktor.request.acceptCharset
 
 typealias ProcessingCallback = ApplicationCall.() -> Unit
 
