@@ -6,6 +6,7 @@ dependencies {
 
     implementation "io.ktor:ktor-client-core:$ktor"
     implementation "io.ktor:ktor-client-cio:$ktor"
+    implementation "io.ktor:ktor-client-apache:$ktor"
     implementation "io.ktor:ktor-client-logging:$ktor"
 
     implementation "io.ktor:ktor-server-core:$ktor"
@@ -13,6 +14,9 @@ dependencies {
     implementation "io.ktor:ktor-server-netty:$ktor"
     implementation "io.ktor:ktor-network-tls-certificates:$ktor"
     implementation "ch.qos.logback:logback-classic:$logback"
+
+    implementation "com.google.code.gson:gson:$gson"
+    implementation "org.yaml:snakeyaml:$snakeyaml"
     testImplementation "io.ktor:ktor-server-test-host:$ktor"
     testImplementation "io.ktor:ktor-client-mock:$ktor"
 }

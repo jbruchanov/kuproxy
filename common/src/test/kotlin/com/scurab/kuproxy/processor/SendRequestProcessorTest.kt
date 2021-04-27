@@ -1,7 +1,7 @@
 package com.scurab.kuproxy.processor
 
+import com.scurab.kuproxy.comm.Headers
 import com.scurab.kuproxy.ext.toDomainRequest
-import com.scurab.kuproxy.processor.SendRequestProcessor.Companion.CONTENT_TYPE
 import io.ktor.application.Application
 import io.ktor.application.ApplicationCallPipeline
 import io.ktor.application.call
@@ -11,7 +11,6 @@ import io.ktor.client.engine.mock.MockEngineConfig
 import io.ktor.client.engine.mock.respond
 import io.ktor.content.ByteArrayContent
 import io.ktor.http.ContentType
-import io.ktor.http.Headers
 import io.ktor.http.HttpStatusCode
 import io.ktor.response.respondBytes
 import io.ktor.server.testing.withTestApplication
@@ -24,6 +23,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import test.createTestRequest
 import test.junit.SilentLogsExtension
+import io.ktor.http.Headers as KtorHeaders
 
 @ExtendWith(value = [MockKExtension::class, SilentLogsExtension::class])
 class SendRequestProcessorTest {
@@ -47,7 +47,7 @@ class SendRequestProcessorTest {
     private val testReqHeaders = listOf(
         "Header1" to "Value1",
         "Header2" to "Value2a; Value2b",
-        CONTENT_TYPE to testContentType
+        Headers.ContentType to testContentType
     )
     private val testRespBody = "Response123".toByteArray()
     private val testRespHeaders = listOf("Header3" to "Value3")
@@ -84,7 +84,7 @@ class SendRequestProcessorTest {
             assertEquals(testReqUrl, proxiedRequestFromKtor.url.toString())
             assertEquals(testReqMethod, proxiedRequestFromKtor.method.value)
             testReqHeaders
-                .filter { !it.first.equals(CONTENT_TYPE, ignoreCase = true) }
+                .filter { !it.first.equals(Headers.ContentType, ignoreCase = true) }
                 .forEach { (k, v) ->
                     assertTrue(proxiedRequestFromKtor.headers.contains(k, v))
                 }
@@ -95,7 +95,7 @@ class SendRequestProcessorTest {
             respond(
                 content = testRespBody,
                 status = testRespCode,
-                headers = Headers.build {
+                headers = KtorHeaders.build {
                     testRespHeaders.forEach { (k, v) -> append(k, v) }
                 }
             )

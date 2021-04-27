@@ -1,18 +1,33 @@
 package com.scurab.kuproxy
 
-import ch.qos.logback.classic.Level
-import ch.qos.logback.classic.Logger
-import com.scurab.kuproxy.processor.PassThroughProcessor
+import com.scurab.kuproxy.matcher.DefaultRequestMatcher
+import com.scurab.kuproxy.model.Tape
+import com.scurab.kuproxy.processor.ReplayProcessor
+import com.scurab.kuproxy.processor.SavingProcessor
+import com.scurab.kuproxy.serialisation.TapeExportConverter
+import com.scurab.kuproxy.serialisation.TapeImportConverter
+import com.scurab.kuproxy.storage.MemRepository
+import com.scurab.kuproxy.storage.RequestResponse
 import com.scurab.ssl.CertificateFactory
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.cio.CIO
+import io.ktor.client.engine.apache.Apache
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-import org.slf4j.LoggerFactory
+import org.junit.jupiter.api.extension.ExtendWith
+import org.yaml.snakeyaml.DumperOptions
+import org.yaml.snakeyaml.Yaml
+import org.yaml.snakeyaml.nodes.Tag
 import test.SslHelper
+import test.junit.SilentLogsExtension
+import java.io.File
+import java.util.concurrent.Executors
 
+@ExtendWith(SilentLogsExtension::class)
 internal class ProxyServerTest {
 
     val domains = listOf("localhost", "zunpa.cz", "scurab.com", "*.scurab.com", "cdr.cz", "*.cdr.cz")
@@ -23,7 +38,6 @@ internal class ProxyServerTest {
     @Test
     @Disabled("manual")
     fun test() = runBlocking {
-        (LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger).level = Level.OFF
 
         val serverCertsKeyStore =
             SslHelper.createServerCertSignedByCA(CertificateFactory.embeddedCACertificate, domains)
@@ -33,8 +47,34 @@ internal class ProxyServerTest {
             keyAlias = SslHelper.ServerAlias
         }
 
-        val client = HttpClient(CIO) { expectSuccess = false }
-        val processor = PassThroughProcessor(client)
+        val client = HttpClient(Apache) {
+            expectSuccess = false
+        }
+
+        val saving = true
+        val processor = if (saving) {
+            val savingDispatches = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
+            val repo = object : MemRepository(DefaultRequestMatcher()) {
+                override fun add(item: RequestResponse) {
+                    super.add(item)
+                    GlobalScope.async(savingDispatches) {
+                        val converter = TapeExportConverter()
+                        val converted = converter.convert(Tape("test", items))
+                        val dump = Yaml().dumpAs(converted, Tag("tape"), DumperOptions.FlowStyle.BLOCK)
+                        File("saved.yaml").outputStream().writer().use {
+                            it.write(dump)
+                        }
+                    }
+                }
+            }
+            SavingProcessor(repo, client)
+        } else {
+            @Suppress("UNCHECKED_CAST")
+            val tape = File("saved.yaml").inputStream()
+                .use { Yaml().loadAs(it, Map::class.java) as Map<String, Any> }
+                .let { TapeImportConverter().convert(it) }
+            ReplayProcessor(MemRepository(tape, DefaultRequestMatcher()), client)
+        }
 
         KtorServer(ktorConfig, processor).start()
         val proxyConfig = ProxyConfig {

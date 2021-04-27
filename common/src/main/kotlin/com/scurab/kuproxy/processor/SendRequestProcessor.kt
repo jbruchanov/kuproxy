@@ -1,5 +1,6 @@
 package com.scurab.kuproxy.processor
 
+import com.scurab.kuproxy.comm.Headers
 import com.scurab.kuproxy.comm.IRequest
 import com.scurab.kuproxy.comm.IResponse
 import com.scurab.kuproxy.comm.Response
@@ -45,7 +46,7 @@ interface SendRequestProcessor {
                     }
                 }
                 val contentType = request.headers.entries
-                    .firstOrNull { it.key.equals(CONTENT_TYPE, ignoreCase = true) }
+                    .firstOrNull { it.key.equals(Headers.ContentType, ignoreCase = true) }
                     ?.let { ContentType.parse(it.value) }
 
                 body = requestBody.takeIf { it.isNotEmpty() }
@@ -70,13 +71,10 @@ interface SendRequestProcessor {
     }
 
     companion object {
-        const val CONTENT_TYPE = "content-type"
-
         //ktor fails if we pass these headers manually,
         //added transitively in requestBody, lower case IMPORTANT!
-        private val IGNORED_HEADERS = setOf("content-length", CONTENT_TYPE)
+        private val IGNORED_HEADERS = setOf(Headers.ContentLength, Headers.ContentType, Headers.AcceptEncoding)
         val AddKuProxyInfoHeader: ProcessingCallback = {
-            //TODO:version
             response.headers.append("KuProxy-Version", BuildConfig.AppVersion)
         }
     }

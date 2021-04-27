@@ -1,6 +1,6 @@
 package com.scurab.kuproxy.matcher
 
-import com.scurab.kuproxy.comm.Headers
+import com.scurab.kuproxy.comm.DomainHeaders
 import com.scurab.kuproxy.comm.IRequest
 
 /**
@@ -16,7 +16,7 @@ class DefaultRequestMatcher : RequestMatcher {
             isMatchingHeaders(real.headers, stored.headers)
     }
 
-    private fun isMatchingHeaders(real: Headers, stored: Headers): Boolean {
+    private fun isMatchingHeaders(real: DomainHeaders, stored: DomainHeaders): Boolean {
         return stored.all { (storedKey, storedValues) ->
             val realValues = real[storedKey] ?: return false
             realValues == storedValues
