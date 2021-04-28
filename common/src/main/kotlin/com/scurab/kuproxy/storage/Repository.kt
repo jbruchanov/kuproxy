@@ -7,6 +7,7 @@ interface Repository {
     val items: List<RequestResponse>
     suspend fun find(request: IRequest): RequestResponse?
     suspend fun add(item: RequestResponse)
+    suspend fun remove(item: RequestResponse): Boolean
 }
 
 open class RequestResponse(

@@ -40,4 +40,10 @@ open class MemRepository(
             _items.add(storingItem)
         }
     }
+
+    override suspend fun remove(item: RequestResponse): Boolean {
+        return synchronized(_items) {
+            _items.remove(item)
+        }
+    }
 }
