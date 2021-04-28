@@ -3,7 +3,7 @@ package com.scurab.kuproxy
 import com.scurab.kuproxy.matcher.DefaultRequestMatcher
 import com.scurab.kuproxy.model.Tape
 import com.scurab.kuproxy.processor.ReplayProcessor
-import com.scurab.kuproxy.processor.SavingProcessor
+import com.scurab.kuproxy.processor.RecordingProcessor
 import com.scurab.kuproxy.serialisation.TapeExportConverter
 import com.scurab.kuproxy.serialisation.TapeImportConverter
 import com.scurab.kuproxy.storage.MemRepository
@@ -67,7 +67,7 @@ internal class ProxyServerTest {
                     }
                 }
             }
-            SavingProcessor(repo, client)
+            RecordingProcessor(repo, client)
         } else {
             @Suppress("UNCHECKED_CAST")
             val tape = File("saved.yaml").inputStream()

@@ -23,7 +23,7 @@ import test.junit.SilentLogsExtension
 import test.testRequest
 
 @ExtendWith(value = [MockKExtension::class, SilentLogsExtension::class])
-internal class SavingProcessorTest {
+internal class RecordingProcessorTest {
 
     @RelaxedMockK
     lateinit var repo: Repository
@@ -34,11 +34,11 @@ internal class SavingProcessorTest {
     @MockK
     lateinit var response: IResponse
 
-    private lateinit var processor: SavingProcessor
+    private lateinit var processor: RecordingProcessor
 
     @BeforeEach
     fun setUp() {
-        processor = spyk(SavingProcessor(repo, client))
+        processor = spyk(RecordingProcessor(repo, client))
     }
 
     @Test

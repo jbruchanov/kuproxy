@@ -6,7 +6,7 @@ import com.scurab.kuproxy.storage.RequestResponse
 import io.ktor.application.ApplicationCall
 import io.ktor.client.HttpClient
 
-class SavingProcessor(
+class RecordingProcessor(
     private val repo: Repository,
     client: HttpClient
 ) : ReplayProcessor(repo, client) {
