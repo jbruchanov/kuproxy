@@ -2,9 +2,7 @@ package com.scurab.kuproxy.serialisation
 
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonParser
-import com.scurab.kuproxy.comm.DomainHeaders
 import com.scurab.kuproxy.comm.Headers
-import com.scurab.kuproxy.comm.IRequest
 import com.scurab.kuproxy.comm.IResponse
 import com.scurab.kuproxy.comm.Request
 import com.scurab.kuproxy.comm.Response
@@ -45,7 +43,6 @@ class Field<T> private constructor(val fieldName: String) {
 
 open class TapeExportConverter(
     private val dateLongConverter: DateLongConverter = DateLongConverter(),
-    private val headersToStore: Set<String>? = emptySet(),
     private val textContentHeaders: List<Regex> = TEXT_CONTENT_HEADERS
 ) {
     fun convert(item: Tape): Map<String, Any> = obj(
@@ -55,7 +52,7 @@ open class TapeExportConverter(
                 Field.Request to obj(
                     Field.Url to req.url.toString(),
                     Field.Method to req.method,
-                    Field.Headers to req.filteredHeaders(headersToStore),
+                    Field.Headers to req.headers,
                     Field.Recorded to dateLongConverter.convert(req.recorded),
                 ),
                 Field.Response to obj(
@@ -66,11 +63,6 @@ open class TapeExportConverter(
             )
         }
     )
-
-    private fun IRequest.filteredHeaders(headersToStore: Set<String>?): DomainHeaders? =
-        headers
-            .filterKeys { headersToStore?.contains(it.toLowerCase()) ?: true }
-            .takeIf { it.isNotEmpty() }
 
     private fun IResponse.serialisedBody(): Any? {
         val contentType = headers.entries

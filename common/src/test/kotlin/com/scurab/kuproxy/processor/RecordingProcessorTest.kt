@@ -13,7 +13,6 @@ import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.slot
 import io.mockk.spyk
-import io.mockk.verify
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -23,7 +22,7 @@ import test.junit.SilentLogsExtension
 import test.testRequest
 
 @ExtendWith(value = [MockKExtension::class, SilentLogsExtension::class])
-internal class SavingProcessorTest {
+internal class RecordingProcessorTest {
 
     @RelaxedMockK
     lateinit var repo: Repository
@@ -34,11 +33,11 @@ internal class SavingProcessorTest {
     @MockK
     lateinit var response: IResponse
 
-    private lateinit var processor: SavingProcessor
+    private lateinit var processor: RecordingProcessor
 
     @BeforeEach
     fun setUp() {
-        processor = spyk(SavingProcessor(repo, client))
+        processor = spyk(RecordingProcessor(repo, client))
     }
 
     @Test
@@ -54,7 +53,7 @@ internal class SavingProcessorTest {
                 coVerify { processor.send(request, domainRequest) }
 
                 val slot = slot<RequestResponse>()
-                verify { repo.add(capture(slot)) }
+                coVerify { repo.add(capture(slot)) }
 
                 assertEquals(domainRequest, slot.captured.request)
                 assertEquals(response, slot.captured.response)

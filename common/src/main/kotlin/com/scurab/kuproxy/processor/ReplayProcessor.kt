@@ -12,13 +12,13 @@ open class ReplayProcessor(
 ) : KtorProcessor,
     SendRequestProcessor by SendRequestProcessor.Impl(client) {
 
-    override suspend fun process(call: ApplicationCall) {
-        val domainRequest = call.toDomainRequest()
-        val item = repo.find(domainRequest)
-        if (item?.response != null) {
-            call.respond(item.response)
+    override suspend fun process(item: ApplicationCall) {
+        val domainRequest = item.toDomainRequest()
+        val stored = repo.find(domainRequest)
+        if (stored != null) {
+            item.respond(stored.response)
         } else {
-            send(call, domainRequest)
+            send(item, domainRequest)
         }
     }
 }
