@@ -51,9 +51,7 @@ internal class YamlConverterTest {
 
     @Test
     fun testSerialise() {
-        val converter = TapeExportConverter(
-            headersToStore = null/*all headers*/
-        )
+        val converter = TapeExportConverter()
         val converted = converter.convert(tape)
         val dump = Yaml().dumpAs(converted, Tag("tape"), DumperOptions.FlowStyle.BLOCK)
         assertEquals(expected, dump)

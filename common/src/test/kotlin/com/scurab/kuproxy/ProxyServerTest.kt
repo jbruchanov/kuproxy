@@ -55,7 +55,7 @@ internal class ProxyServerTest {
         val processor = if (saving) {
             val savingDispatches = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
             val repo = object : MemRepository(DefaultRequestMatcher()) {
-                override fun add(item: RequestResponse) {
+                override suspend fun add(item: RequestResponse) {
                     super.add(item)
                     GlobalScope.async(savingDispatches) {
                         val converter = TapeExportConverter()

@@ -36,10 +36,12 @@ internal class ReplayProcessorTest {
 
     @MockK
     lateinit var request: IRequest
+
     @MockK
     lateinit var response: IResponse
 
     private lateinit var processor: ReplayProcessor
+
     @InjectMockKs
     private lateinit var requestResponse: RequestResponse
 
@@ -54,8 +56,7 @@ internal class ReplayProcessorTest {
     fun `process When request match found in repo Then returns as response`() {
         withTestApplication {
             val testRequest = testRequest()
-            println()
-            every { repo.find(testRequest.toDomainRequest()) } returns requestResponse
+            coEvery { repo.find(testRequest.toDomainRequest()) } returns requestResponse
             mockkStatic("com.scurab.kuproxy.ext.ApplicationCallKt")
             coEvery { testRequest.respond(any(), any()) } returns mockk()
 
@@ -74,7 +75,7 @@ internal class ReplayProcessorTest {
             val testRequest = testRequest()
             val domainRequest = testRequest.toDomainRequest()
 
-            every { repo.find(domainRequest) } returns null
+            coEvery { repo.find(domainRequest) } returns null
             mockkStatic("com.scurab.kuproxy.ext.ApplicationCallKt")
             coEvery { processor.send(any(), any()) } returns mockk()
 

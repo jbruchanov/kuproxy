@@ -5,8 +5,8 @@ import com.scurab.kuproxy.comm.IResponse
 
 interface Repository {
     val items: List<RequestResponse>
-    fun find(request: IRequest): RequestResponse?
-    fun add(item: RequestResponse)
+    suspend fun find(request: IRequest): RequestResponse?
+    suspend fun add(item: RequestResponse)
 }
 
 open class RequestResponse(

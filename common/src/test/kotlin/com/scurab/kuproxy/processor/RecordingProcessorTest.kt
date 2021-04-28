@@ -54,7 +54,7 @@ internal class RecordingProcessorTest {
                 coVerify { processor.send(request, domainRequest) }
 
                 val slot = slot<RequestResponse>()
-                verify { repo.add(capture(slot)) }
+                coVerify { repo.add(capture(slot)) }
 
                 assertEquals(domainRequest, slot.captured.request)
                 assertEquals(response, slot.captured.response)
