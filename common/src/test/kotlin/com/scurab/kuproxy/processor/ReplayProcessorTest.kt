@@ -10,7 +10,6 @@ import io.ktor.client.HttpClient
 import io.ktor.server.testing.withTestApplication
 import io.mockk.coEvery
 import io.mockk.coVerify
-import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.impl.annotations.RelaxedMockK

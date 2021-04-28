@@ -1,10 +1,10 @@
 package com.scurab.kuproxy.processor
 
+import com.scurab.kuproxy.ext.respond
 import com.scurab.kuproxy.ext.toDomainRequest
 import com.scurab.kuproxy.storage.Repository
 import io.ktor.application.ApplicationCall
 import io.ktor.client.HttpClient
-import io.ktor.response.respond
 
 open class ReplayProcessor(
     private val repo: Repository,
@@ -14,9 +14,9 @@ open class ReplayProcessor(
 
     override suspend fun process(item: ApplicationCall) {
         val domainRequest = item.toDomainRequest()
-        val requestResponse = repo.find(domainRequest)
-        if (requestResponse?.response != null) {
-            item.respond(item.response)
+        val stored = repo.find(domainRequest)
+        if (stored != null) {
+            item.respond(stored.response)
         } else {
             send(item, domainRequest)
         }
