@@ -10,15 +10,18 @@ import org.slf4j.LoggerFactory
 class SilentLogsExtension :
     BeforeAllCallback, AfterAllCallback {
 
-    private var initLevel: Level? = null
-    private val logger get() = (LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger)
+    private val loggers = listOf("io.mockk", "ktor")
+    private fun logger(key: String) = (LoggerFactory.getLogger(key) as Logger)
 
     override fun beforeAll(context: ExtensionContext) {
-        initLevel = logger.level
-        logger.level = Level.OFF
+        loggers.forEach {
+            logger(it).level = Level.OFF
+        }
     }
 
     override fun afterAll(context: ExtensionContext) {
-        initLevel?.let { logger.level = it }
+        loggers.forEach {
+            logger(it).level = Level.DEBUG
+        }
     }
 }

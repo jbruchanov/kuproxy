@@ -57,7 +57,7 @@ interface SendRequestProcessor {
             val domainResponse = with(realResponse) {
                 Response(
                     status.value,
-                    headers.toDomainHeaders(),
+                    headers.toDomainHeaders().filterKeys { !IGNORED_RESPONSE_HEADERS.contains(it.toLowerCase()) },
                     readBytes()
                 )
             }
@@ -74,8 +74,9 @@ interface SendRequestProcessor {
         //ktor fails if we pass these headers manually,
         //added transitively in requestBody, lower case IMPORTANT!
         private val IGNORED_HEADERS = setOf(Headers.ContentLength, Headers.ContentType, Headers.AcceptEncoding)
+        private val IGNORED_RESPONSE_HEADERS = setOf(Headers.ContentLength)
         val AddKuProxyInfoHeader: ProcessingCallback = {
-            response.headers.append("KuProxy-Version", BuildConfig.AppVersion)
+            response.headers.append(Headers.KuProxyVersion, BuildConfig.AppVersion)
         }
     }
 }
