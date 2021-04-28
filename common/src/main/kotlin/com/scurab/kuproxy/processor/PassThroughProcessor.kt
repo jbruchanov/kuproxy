@@ -10,7 +10,7 @@ open class PassThroughProcessor(
 ) : KtorProcessor,
     SendRequestProcessor by SendRequestProcessor.Impl(client) {
 
-    override suspend fun process(call: ApplicationCall) {
-        send(call, call.toDomainRequest())
+    override suspend fun process(item: ApplicationCall) {
+        send(item, item.toDomainRequest())
     }
 }
