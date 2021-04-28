@@ -52,7 +52,7 @@ open class TapeExportConverter(
                 Field.Request to obj(
                     Field.Url to req.url.toString(),
                     Field.Method to req.method,
-                    Field.Headers to req.headers,
+                    Field.Headers to req.headers.takeIf { it.isNotEmpty() },
                     Field.Recorded to dateLongConverter.convert(req.recorded),
                 ),
                 Field.Response to obj(
