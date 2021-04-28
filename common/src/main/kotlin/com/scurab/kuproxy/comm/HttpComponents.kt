@@ -1,5 +1,7 @@
 package com.scurab.kuproxy.comm
 
+import java.util.Date
+
 typealias DomainHeaders = Map<String, String>
 
 interface IRequest {
@@ -45,7 +47,7 @@ class Request(
     }
 
     override fun toString(): String {
-        return "Request(url=$url, method='$method', headers=$headers, recorded=$recorded)"
+        return "Request(url=$url, method='$method', headers=$headers, recorded=${Date(recorded).toGMTString()})"
     }
 }
 
