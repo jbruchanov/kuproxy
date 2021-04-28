@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory
 class SilentLogsExtension :
     BeforeAllCallback, AfterAllCallback {
 
-    private val loggers = listOf("io.mockk", "ktor")
+    private val loggers = listOf("io.mockk", "ktor", "io.netty")
     private fun logger(key: String) = (LoggerFactory.getLogger(key) as Logger)
 
     override fun beforeAll(context: ExtensionContext) {
