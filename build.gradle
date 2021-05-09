@@ -4,7 +4,8 @@ buildscript {
         mavenLocal()
         mavenCentral()
         google()
-        jcenter()
+        //compose
+        maven { url("https://maven.pkg.jetbrains.space/public/p/compose/dev") }
         //ktlint
         maven { url("https://plugins.gradle.org/m2/") }
     }
@@ -14,6 +15,7 @@ buildscript {
         classpath "org.jlleitschuh.gradle:ktlint-gradle:$ktLintPlugin"
         classpath "com.vanniktech:gradle-android-junit-jacoco-plugin:$jacocoPlugin"
         classpath "com.github.gmazzo:gradle-buildconfig-plugin:$gmazzo"
+        classpath "org.jetbrains.compose:compose-gradle-plugin:$compose"
     }
 }
 
@@ -24,7 +26,8 @@ allprojects {
         mavenLocal()
         mavenCentral()
         google()
-        jcenter()
+        //compose
+        maven { url("https://maven.pkg.jetbrains.space/public/p/compose/dev") }
     }
 }
 
