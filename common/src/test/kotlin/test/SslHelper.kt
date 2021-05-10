@@ -1,11 +1,10 @@
 package test
 
 import com.scurab.ssl.CertificateFactory
-import sun.misc.BASE64Encoder
-import sun.security.provider.X509Factory
 import java.io.File
 import java.security.KeyStore
 import java.security.cert.Certificate
+import java.util.Base64
 
 object SslHelper {
     const val KeystoreType = CertificateFactory.PKCS
@@ -14,6 +13,8 @@ object SslHelper {
     const val CAAlias = "KuProxyCA"
     const val ServerAlias = ServerCN
     val Password = CertificateFactory.EMPTY_PWD
+    const val BEGIN_CERT = "-----BEGIN CERTIFICATE-----"
+    const val END_CERT = "-----END CERTIFICATE-----"
 
     fun createServerCertSignedByCA(
         rootCert: CertificateFactory.Cert? = null,
@@ -35,9 +36,9 @@ object SslHelper {
 
     fun saveCer(file: File, cert: Certificate) {
         file.outputStream().use {
-            it.write((X509Factory.BEGIN_CERT + "\n").toByteArray())
-            BASE64Encoder().encodeBuffer(cert.encoded, it)
-            it.write((X509Factory.END_CERT + "\n").toByteArray())
+            it.write((BEGIN_CERT + "\n").toByteArray())
+            it.write(Base64.getEncoder().encode(cert.encoded))
+            it.write((END_CERT + "\n").toByteArray())
         }
     }
 }

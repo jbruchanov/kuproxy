@@ -1,4 +1,5 @@
-rootProject.name = 'kuproxy'
+rootProject.name = "kuproxy"
 
-include ':common'
-include ':app-console'
+include(":common")
+include(":app-console")
+include(":app-desktop")

@@ -4,8 +4,6 @@ import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-import sun.misc.BASE64Encoder
-import sun.security.provider.X509Factory
 import test.SslHelper
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -13,6 +11,7 @@ import java.io.File
 import java.security.KeyStore
 import java.security.PrivateKey
 import java.security.cert.X509Certificate
+import java.util.Base64
 
 internal class CertificateFactoryTest {
 
@@ -79,9 +78,9 @@ internal class CertificateFactoryTest {
         val rootCert = CertificateFactory.createCACertificate("TestRootCA")
         val cert = ByteArrayOutputStream()
             .also {
-                it.write((X509Factory.BEGIN_CERT + "\n").toByteArray())
-                BASE64Encoder().encodeBuffer(rootCert.certificate.encoded, it)
-                it.write((X509Factory.END_CERT + "\n").toByteArray())
+                it.write((SslHelper.BEGIN_CERT + "\n").toByteArray())
+                it.writeBytes(Base64.getEncoder().encode(rootCert.certificate.encoded))
+                it.write((SslHelper.END_CERT + "\n").toByteArray())
             }
             .toString()
 

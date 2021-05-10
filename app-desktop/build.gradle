@@ -1,0 +1,26 @@
+apply from: "$rootProject.projectDir/build-java-lib.gradle"
+apply plugin: "org.jetbrains.compose"
+
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+
+dependencies {
+    implementation project(":common")
+    implementation(compose.desktop.currentOs)
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "11"
+}
+
+compose {
+    desktop {
+        application {
+            mainClass = "com.scurab.kuproxy.desktop.DesktopAppKt"
+            nativeDistributions {
+                targetFormats(TargetFormat.Exe)
+                packageName = "kuproxy-desktop"
+                packageVersion = project["version"].with { it.substring(0, it.indexOf("-")) }
+            }
+        }
+    }
+}
