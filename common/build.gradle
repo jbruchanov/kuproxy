@@ -4,9 +4,9 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib"
     implementation "org.bouncycastle:bcpkix-jdk15on:$bouncyCastle"
 
-    implementation "io.ktor:ktor-client-core:$ktor"
+    api "io.ktor:ktor-client-core:$ktor"
     implementation "io.ktor:ktor-client-cio:$ktor"
-    implementation "io.ktor:ktor-client-apache:$ktor"
+    api "io.ktor:ktor-client-apache:$ktor"
     implementation "io.ktor:ktor-client-logging:$ktor"
 
     implementation "io.ktor:ktor-server-core:$ktor"
