@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import java.text.SimpleDateFormat
 
 @Composable
@@ -49,6 +50,7 @@ object AppTheme {
         val step_0_5 = 4.dp
         val step = 8.dp
         val step_2 = 16.dp
+        val step_2_5 = 24.dp
         val step_4 = 32.dp
         val step_6 = 48.dp
         val step_8 = 64.dp
@@ -63,6 +65,11 @@ object AppTheme {
         val border = Spacing.harline
         val resizingBar = Spacing.step_0_25
         val scrollBar = Spacing.step
+    }
+
+    object TextSizes {
+        val small = 12.sp
+        val default = 14.sp
     }
 
     object Colors {
