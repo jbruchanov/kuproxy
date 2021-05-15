@@ -19,13 +19,13 @@ import com.scurab.kuproxy.desktop.LocalDateTimeFormats
 import com.scurab.kuproxy.storage.RequestResponse
 
 @Composable
-fun RequestRow(item: RequestResponse, onClick: (RequestResponse) -> Unit, modifier: Modifier = Modifier) {
+fun RequestRow(index: Int, item: RequestResponse, onClick: (Int) -> Unit, modifier: Modifier = Modifier) {
     val formats = LocalDateTimeFormats.current
     Row(
         modifier = Modifier
             .padding(vertical = AppTheme.Spacing.harline)
             .defaultMinSize(minHeight = AppTheme.Spacing.step_2_5)
-            .clickable { onClick(item) }
+            .clickable { onClick(index) }
             .then(modifier),
         horizontalArrangement = Arrangement.spacedBy(AppTheme.Spacing.step),
         verticalAlignment = Alignment.CenterVertically

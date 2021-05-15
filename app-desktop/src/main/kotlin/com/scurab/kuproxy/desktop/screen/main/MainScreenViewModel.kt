@@ -5,7 +5,6 @@ import com.scurab.kuproxy.KtorServer
 import com.scurab.kuproxy.ProxyConfig
 import com.scurab.kuproxy.ProxyServer
 import com.scurab.kuproxy.processor.PassThroughProcessor
-import com.scurab.kuproxy.storage.RequestResponse
 import com.scurab.ssl.CertificateFactory
 import com.scurab.ssl.SslHelper
 import kotlinx.coroutines.GlobalScope
@@ -60,11 +59,13 @@ class MainScreenViewModel {
 
     fun onDeleteClicked() = with(state) {
         items.clear()
-        selectedObject = null
+        selectedIndex = null
     }
 
-    fun onItemSelected(item: RequestResponse) = with(state) {
-        selectedObject = item.takeIf { state.selectedObject != item }
+    fun onItemSelected(index: Int) = with(state) {
+        selectedIndex = index
+            .inItemsRange()
+            .takeIf { state.selectedIndex != index }
     }
 
     fun onSettingsClicked() = with(state) {
@@ -79,4 +80,14 @@ class MainScreenViewModel {
             start()
         }
     }
+
+    fun onKeyArrowClicked(direction: Int): Int? {
+        val selectedIndex = state.selectedIndex
+        if (selectedIndex != null) {
+            state.selectedIndex = (selectedIndex + direction).inItemsRange()
+        }
+        return state.selectedIndex
+    }
+
+    private fun Int.inItemsRange() = coerceAtLeast(0).coerceAtMost(state.items.size - 1)
 }

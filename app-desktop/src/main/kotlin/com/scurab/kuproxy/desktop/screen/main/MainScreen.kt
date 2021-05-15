@@ -32,23 +32,35 @@ import androidx.compose.ui.unit.dp
 import com.scurab.kuproxy.desktop.AppTheme
 import com.scurab.kuproxy.desktop.components.AppVerticalScrollbar
 import com.scurab.kuproxy.desktop.components.HorizontalResizingContent
+import com.scurab.kuproxy.desktop.components.arrowKeys
 import com.scurab.kuproxy.desktop.content.RequestRow
 import com.scurab.kuproxy.desktop.content.ResponseContent
 import com.scurab.kuproxy.desktop.ext.firstOddElseSecond
 import com.scurab.kuproxy.storage.RequestResponse
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class MainWindowState {
     val items = mutableStateListOf<RequestResponse>()
     var isConfigVisible by mutableStateOf(false)
-    var selectedObject by mutableStateOf<RequestResponse?>(null)
+    var selectedIndex by mutableStateOf<Int?>(null)
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 fun MainScreen(viewModel: MainScreenViewModel = MainScreenViewModel()) = Window(
     centered = false
 ) {
+    val dataScrollState = LazyListState(viewModel.state.items.size - 1, 0)
+
     AppTheme {
-        Surface(modifier = Modifier.fillMaxSize()) {
+        Surface(
+            modifier = Modifier
+                .arrowKeys {
+                    viewModel.onKeyArrowClicked(it)?.also { GlobalScope.launch(Dispatchers.Main) { dataScrollState.scrollToItem(it) } }
+                }
+                .fillMaxSize()
+        ) {
             Scaffold(
                 topBar = {
                     Row {
@@ -75,31 +87,31 @@ fun MainScreen(viewModel: MainScreenViewModel = MainScreenViewModel()) = Window(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                val scrollState = LazyListState(state.items.size - 1, 0)
                                 LazyColumn(
-                                    state = scrollState,
+                                    state = dataScrollState,
                                     modifier = Modifier.weight(1f)
                                 ) {
-                                    items(state.items.size) {
-                                        val item = state.items[it]
+                                    items(state.items.size) { index ->
+                                        val item = state.items[index]
                                         RequestRow(
+                                            index,
                                             item,
                                             onClick = { viewModel.onItemSelected(it) },
                                             modifier = Modifier
                                                 .background(
-                                                    AppTheme.Colors.colors.primaryVariant.takeIf { item == state.selectedObject }
-                                                        ?: AppTheme.Colors.backgroundPair.firstOddElseSecond(it)
+                                                    AppTheme.Colors.colors.primaryVariant.takeIf { index == state.selectedIndex }
+                                                        ?: AppTheme.Colors.backgroundPair.firstOddElseSecond(index)
                                                 )
                                         )
                                     }
                                 }
-                                AppVerticalScrollbar(adapter = ScrollbarAdapter(scrollState, state.items.size, 20f))
+                                AppVerticalScrollbar(adapter = ScrollbarAdapter(dataScrollState, state.items.size, 20f))
                             }
                         },
                         bottom = {
                             Column(modifier = Modifier.padding(AppTheme.Spacing.step).fillMaxSize()) {
-                                state.selectedObject?.let {
-                                    ResponseContent(it)
+                                state.selectedIndex?.let {
+                                    ResponseContent(state.items[it])
                                 }
                             }
                         }
