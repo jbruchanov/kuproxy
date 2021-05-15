@@ -2,6 +2,7 @@ package com.scurab.kuproxy
 
 import com.scurab.kuproxy.matcher.DefaultRequestMatcher
 import com.scurab.kuproxy.model.Tape
+import com.scurab.kuproxy.processor.PassThroughProcessor
 import com.scurab.kuproxy.processor.RecordingProcessor
 import com.scurab.kuproxy.processor.ReplayProcessor
 import com.scurab.kuproxy.serialisation.TapeExportConverter
@@ -30,15 +31,15 @@ import java.util.concurrent.Executors
 @ExtendWith(SilentLogsExtension::class)
 internal class ProxyServerTest {
 
-    val domains = listOf("localhost", "zunpa.cz", "scurab.com", "*.scurab.com", "cdr.cz", "*.cdr.cz")
-    val domainsRegexps = domains.map {
-        ("\\Q$it\\E").replace("*", "\\E.*\\Q").toRegex()
+    val domains = listOf("localhost", "zunpa.cz", "scurab.com", "*.scurab.com", "www.cdr.cz", "*.cdr.cz", "cdr.cz")
+
+    enum class Mode {
+        Passthrough, Record, Replay
     }
 
     @Test
     @Disabled("manual")
     fun test() = runBlocking {
-
         val serverCertsKeyStore =
             SslHelper.createServerCertSignedByCA(CertificateFactory.embeddedCACertificate, domains)
 
@@ -51,36 +52,40 @@ internal class ProxyServerTest {
             expectSuccess = false
         }
 
-        val saving = true
-        val processor = if (saving) {
-            val savingDispatches = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
-            val repo = object : MemRepository(DefaultRequestMatcher()) {
-                override suspend fun add(item: RequestResponse) {
-                    super.add(item)
-                    GlobalScope.async(savingDispatches) {
-                        val converter = TapeExportConverter()
-                        val converted = converter.convert(Tape("test", items))
-                        val dump = Yaml().dumpAs(converted, Tag("tape"), DumperOptions.FlowStyle.BLOCK)
-                        File("saved.yaml").outputStream().writer().use {
-                            it.write(dump)
+        val mode = Mode.Passthrough
+        val processor = when (mode) {
+            Mode.Passthrough -> PassThroughProcessor()
+            Mode.Record -> {
+                val savingDispatches = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
+                val repo = object : MemRepository(DefaultRequestMatcher()) {
+                    override suspend fun add(item: RequestResponse) {
+                        super.add(item)
+                        GlobalScope.async(savingDispatches) {
+                            val converter = TapeExportConverter()
+                            val converted = converter.convert(Tape("test", items))
+                            val dump = Yaml().dumpAs(converted, Tag("tape"), DumperOptions.FlowStyle.BLOCK)
+                            File("saved.yaml").outputStream().writer().use {
+                                it.write(dump)
+                            }
                         }
                     }
                 }
+                RecordingProcessor(repo, client)
             }
-            RecordingProcessor(repo, client)
-        } else {
-            @Suppress("UNCHECKED_CAST")
-            val tape = File("saved.yaml").inputStream()
-                .use { Yaml().loadAs(it, Map::class.java) as Map<String, Any> }
-                .let { TapeImportConverter().convert(it) }
-            ReplayProcessor(MemRepository(tape, DefaultRequestMatcher()), client)
+            Mode.Replay -> {
+                @Suppress("UNCHECKED_CAST")
+                val tape = File("saved.yaml").inputStream()
+                    .use { Yaml().loadAs(it, Map::class.java) as Map<String, Any> }
+                    .let { TapeImportConverter().convert(it) }
+                ReplayProcessor(MemRepository(tape, DefaultRequestMatcher()), client)
+            }
         }
 
         KtorServer(ktorConfig, processor).start()
         val proxyConfig = ProxyConfig {
             httpServerPort = ktorConfig.httpPort
             httpsServerPort = ktorConfig.httpsPort
-            domains = domainsRegexps
+            domains = this@ProxyServerTest.domains
         }
         ProxyServer(proxyConfig).start()
 

@@ -4,27 +4,32 @@ import com.scurab.kuproxy.ext.closeQuietly
 import com.scurab.kuproxy.ext.copyInto
 import com.scurab.kuproxy.ext.readUntil
 import com.scurab.kuproxy.ext.readUntilDoubleCrLf
+import com.scurab.kuproxy.ext.toDomainRegex
 import com.scurab.kuproxy.util.AnsiEffect
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.io.BufferedInputStream
 import java.net.InetSocketAddress
+import java.net.ServerSocket
 import java.net.Socket
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
-import java.util.concurrent.Executor
-import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicInteger
 import javax.net.ServerSocketFactory
 
 class ProxyServer(private val config: ProxyConfig) {
 
-    private var socket: Socket? = null
+    private var socket: ServerSocket? = null
+    private var job: Job? = null
     private var isActive = false
-    private val executor: Executor = Executors.newCachedThreadPool()
     private val workingThreads = AtomicInteger()
+    private val domains = config.domains.map { it.toDomainRegex() }
 
     fun start() {
         if (socket != null) {
@@ -32,12 +37,14 @@ class ProxyServer(private val config: ProxyConfig) {
         }
 
         isActive = true
-        GlobalScope.launch(Dispatchers.IO) {
-            val socket = ServerSocketFactory.getDefault().createServerSocket(config.port)
+        job = GlobalScope.launch(Dispatchers.IO) {
+            val socket = ServerSocketFactory.getDefault().createServerSocket(config.port).also {
+                this@ProxyServer.socket = it
+            }
             while (this@ProxyServer.isActive) {
                 try {
                     val connectedSocket = socket.accept()
-                    async {
+                    launch(Dispatchers.IO) {
                         try {
                             handleSocket(connectedSocket)
                         } catch (t: Throwable) {
@@ -53,12 +60,17 @@ class ProxyServer(private val config: ProxyConfig) {
 
     fun stop() {
         isActive = false
-        kotlin.runCatching { socket?.close() }
+        socket?.closeQuietly()
+        runBlocking {
+            //TODO: something better
+            println("ProxyServer:cancelAndJoin")
+            job?.cancelAndJoin()
+        }
         socket = null
         workingThreads.set(0)
     }
 
-    private fun handleSocket(clientSocket: Socket) {
+    private suspend fun handleSocket(clientSocket: Socket) {
         val bufferedInputStream = BufferedInputStream(clientSocket.getInputStream())
         val line = bufferedInputStream
             .readUntil(CRLF)
@@ -70,7 +82,7 @@ class ProxyServer(private val config: ProxyConfig) {
         }
     }
 
-    private fun onRequest(clientSocket: Socket, def: ConnectDef, istream: BufferedInputStream) {
+    private suspend fun onRequest(clientSocket: Socket, def: ConnectDef, istream: BufferedInputStream) {
         var serverSocket: Socket? = null
         try {
             serverSocket = createSocket(def)
@@ -103,18 +115,21 @@ class ProxyServer(private val config: ProxyConfig) {
             }
         }
 
-        jobTask {
-            istream.copyInto(serverSocket.getOutputStream())
-        }
-        jobTask {
-            serverSocket.getInputStream().copyInto(clientSocket.getOutputStream())
-            clientSocket.closeQuietly()
-            serverSocket.closeQuietly()
+        coroutineScope {
+            jobTask {
+                istream.copyInto(serverSocket.getOutputStream())
+            }
+
+            jobTask {
+                serverSocket.getInputStream().copyInto(clientSocket.getOutputStream())
+                clientSocket.closeQuietly()
+                serverSocket.closeQuietly()
+            }
         }
     }
 
     private fun createSocket(def: ConnectDef): Socket {
-        val isProcessing = config.domains.find { regexp -> def.url.matches(regexp) } != null
+        val isProcessing = domains.find { regexp -> def.url.matches(regexp) } != null
 
         val url = if (isProcessing) LOCALHOST else def.url
         val port = when {
@@ -128,8 +143,8 @@ class ProxyServer(private val config: ProxyConfig) {
         }
     }
 
-    private fun jobTask(block: () -> Unit) {
-        executor.execute {
+    private fun CoroutineScope.jobTask(block: suspend () -> Unit) {
+        launch(Dispatchers.IO) {
             workingThreads.incrementAndGet()
             try {
                 block()
