@@ -8,6 +8,10 @@ interface Texts {
     val port: AnnotatedString
     val ok: AnnotatedString
     val cancel: AnnotatedString
+    val proxy: AnnotatedString
+    val passthrough: AnnotatedString
+    val replay: AnnotatedString
+    val record: AnnotatedString
 }
 
 object EnTexts : Texts {
@@ -15,4 +19,8 @@ object EnTexts : Texts {
     override val port: AnnotatedString = "Port".ans
     override val ok: AnnotatedString = "OK".ans
     override val cancel: AnnotatedString = "Cancel".ans
+    override val proxy: AnnotatedString = "Proxy".ans
+    override val passthrough: AnnotatedString = "Passthrough".ans
+    override val replay: AnnotatedString = "Replay".ans
+    override val record: AnnotatedString = "Record".ans
 }

@@ -4,6 +4,7 @@ import com.scurab.kuproxy.KtorConfig
 import com.scurab.kuproxy.KtorServer
 import com.scurab.kuproxy.ProxyConfig
 import com.scurab.kuproxy.ProxyServer
+import com.scurab.kuproxy.desktop.ext.ans
 import com.scurab.kuproxy.processor.PassThroughProcessor
 import com.scurab.ssl.CertificateFactory
 import com.scurab.ssl.SslHelper
@@ -36,7 +37,7 @@ class MainScreenViewModel {
         val processor = PassThroughProcessor().apply {
             callback = {
                 synchronized(state) {
-                    state.items.add(it)
+                    state.proxyTabState.items.add(it)
                 }
             }
         }
@@ -57,15 +58,14 @@ class MainScreenViewModel {
         ktorServer = null
     }
 
-    fun onDeleteClicked() = with(state) {
+    fun onDeleteClicked() = with(state.proxyTabState) {
         items.clear()
-        selectedIndex = null
+        selectedRowIndex = -1
     }
 
-    fun onItemSelected(index: Int) = with(state) {
-        selectedIndex = index
+    fun onItemSelected(index: Int) = with(state.proxyTabState) {
+        selectedRowIndex = index
             .inItemsRange()
-            .takeIf { state.selectedIndex != index }
     }
 
     fun onSettingsClicked() = with(state) {
@@ -81,13 +81,36 @@ class MainScreenViewModel {
         }
     }
 
-    fun onKeyArrowClicked(direction: Int): Int? {
-        val selectedIndex = state.selectedIndex
-        if (selectedIndex != null) {
-            state.selectedIndex = (selectedIndex + direction).inItemsRange()
+    fun onTabClosed(tab: TabItem) = with(state) {
+        state.tabs.remove(tab)
+        if (tab == selectedTab) {
+            selectedTab = state.tabs.first()
         }
-        return state.selectedIndex
     }
 
-    private fun Int.inItemsRange() = coerceAtLeast(0).coerceAtMost(state.items.size - 1)
+    fun onTabClicked(tab: TabItem) {
+        state.selectedTab = tab
+    }
+
+    fun onTabChecked(tab: TabItem) {
+        state.checkedTab = tab
+    }
+
+    private var newTabCounter = 1
+
+    fun addNewTab() {
+        val newTab = TabItem("New-$newTabCounter".ans, closable = true, checkable = true, TabState())
+        state.tabs.add(newTab)
+        if (state.checkedTab == null) {
+            state.checkedTab = newTab
+        }
+        newTabCounter++
+    }
+
+    fun onModeChanged(mode: Mode) {
+        state.mode = mode
+        state.modeDropDownMenuExpanded = false
+    }
+
+    private fun Int.inItemsRange() = coerceAtLeast(0).coerceAtMost(state.proxyTabState.items.size - 1)
 }

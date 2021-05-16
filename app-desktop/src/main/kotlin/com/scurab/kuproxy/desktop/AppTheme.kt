@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.text.SimpleDateFormat
@@ -63,8 +64,12 @@ object AppTheme {
 
     object Sizes {
         val border = Spacing.harline
-        val resizingBar = Spacing.step_0_25
+        val divider = Spacing.step_0_25
+        val resizingBar = divider
         val scrollBar = Spacing.step
+        val buttonMinHeight = 40.dp
+        val buttonMinWidth = 64.dp
+        val tabIconSize = 16.dp
     }
 
     object TextSizes {
@@ -73,15 +78,20 @@ object AppTheme {
     }
 
     object Colors {
+        val transparent = Color.Transparent
         val textOnBackground = Color.White
         val textOnBackgroundDisabled = Color(0xFF808080)
         val backgroundContent = Color(0xFF2B2B2B)
         val backgroundControl = Color(0xFF37393b)
-        val backgroundPair = Pair(Color(0xFF37393b), Color(0xFF313335))
+        val backgroundRows = Pair(backgroundControl, Color(0xFF313335))
+        val backgroundTabs = Pair(backgroundControl, backgroundContent)
+        val tabBorder = backgroundControl
 
         val darkMaterial = darkColors(
-            primary = Color(0xFFFF7800),
-            primaryVariant = Color(0xFFFF9046),
+            primary = Color(0xFFF57F17),
+            primaryVariant = Color(0xFFE65100),
+            secondary = Color(0xFFCDDC39),
+            secondaryVariant = Color(0xFF9E9D24),
             surface = backgroundContent,
             background = backgroundContent,
             onBackground = textOnBackground,
@@ -89,6 +99,9 @@ object AppTheme {
         )
 
         val colors = darkMaterial
+
+        val primaryTransparent = Pair(colors.primary, transparent)
+        val primaryOnBackground = Pair(colors.primary, colors.onBackground)
     }
 
     object TextStyles {
@@ -104,6 +117,7 @@ object AppTheme {
             fontFamily = FontFamily.Monospace,
             color = Colors.colors.onBackground
         )
+        val boldNormal = Pair(FontWeight.Bold, FontWeight.Normal)
     }
 
     val scrollBarStyle = ScrollbarStyle(
