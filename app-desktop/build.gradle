@@ -4,8 +4,10 @@ apply plugin: "org.jetbrains.compose"
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 dependencies {
+    def composeVersion = project["compose"]
     implementation project(":common")
     implementation(compose.desktop.currentOs)
+    implementation "org.jetbrains.compose.material:material-icons-extended:$composeVersion"
 }
 
 compileKotlin {

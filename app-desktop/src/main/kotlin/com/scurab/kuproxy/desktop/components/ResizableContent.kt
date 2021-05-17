@@ -134,7 +134,7 @@ private fun ResizingDivider(
                     padding(horizontal = AppTheme.Spacing.step_0_5)
                 }
             }
-            .background(AppTheme.Colors.colors.primaryVariant)
+            .background(AppTheme.Colors.colors.primary)
             .then(modifier)
     ) {
     }
