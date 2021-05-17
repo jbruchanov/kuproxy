@@ -115,7 +115,7 @@ fun TabButton(
             Spacer(modifier = Modifier.width(AppTheme.Spacing.step))
             Text(
                 tab.name,
-                color = AppTheme.Colors.primaryOnBackground.firstIfTrueElseSecond(selected),
+                color = AppTheme.Colors.secondaryOnBackground.firstIfTrueElseSecond(selected),
                 fontWeight = AppTheme.TextStyles.boldNormal.firstIfTrueElseSecond(selected),
                 modifier = Modifier.defaultMinSize(minWidth = 100.dp)
             )

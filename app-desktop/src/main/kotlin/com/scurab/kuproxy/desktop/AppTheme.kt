@@ -72,6 +72,13 @@ object AppTheme {
         val tabIconSize = 16.dp
     }
 
+    object Scales {
+        val pressed = 0.95f
+        val default = 1f
+
+        val pressedDefault = Pair(pressed, default)
+    }
+
     object TextSizes {
         val small = 12.sp
         val default = 14.sp
@@ -88,8 +95,8 @@ object AppTheme {
         val tabBorder = backgroundControl
 
         val darkMaterial = darkColors(
-            primary = Color(0xFFF57F17),
-            primaryVariant = Color(0xFFE65100),
+            primary = Color(0xFF546E7A),
+            primaryVariant = Color(0xFF90A4AE),
             secondary = Color(0xFFCDDC39),
             secondaryVariant = Color(0xFF9E9D24),
             surface = backgroundContent,
@@ -101,7 +108,9 @@ object AppTheme {
         val colors = darkMaterial
 
         val primaryTransparent = Pair(colors.primary, transparent)
+        val primaryPrimaryVariant = Pair(colors.primary, colors.primaryVariant)
         val primaryOnBackground = Pair(colors.primary, colors.onBackground)
+        val secondaryOnBackground = Pair(colors.secondary, colors.onBackground)
     }
 
     object TextStyles {
