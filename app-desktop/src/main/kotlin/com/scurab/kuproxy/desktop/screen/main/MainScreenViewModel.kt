@@ -113,4 +113,8 @@ class MainScreenViewModel {
     }
 
     private fun Int.inItemsRange() = coerceAtLeast(0).coerceAtMost(state.proxyTabState.items.size - 1)
+
+    fun onKeepScrolledBottomClicked() {
+        state.keepScrolledBottom = !state.keepScrolledBottom
+    }
 }

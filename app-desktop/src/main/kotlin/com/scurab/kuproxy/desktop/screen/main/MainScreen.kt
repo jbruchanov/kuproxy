@@ -2,7 +2,6 @@ package com.scurab.kuproxy.desktop.screen.main
 
 import androidx.compose.desktop.Window
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.ScrollbarAdapter
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
@@ -24,10 +24,12 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.unit.dp
 import com.scurab.kuproxy.desktop.AppTheme
 import com.scurab.kuproxy.desktop.EnTexts
 import com.scurab.kuproxy.desktop.LocalTexts
@@ -56,6 +58,8 @@ enum class Mode(
 }
 
 class MainWindowState {
+    var keepScrolledBottom by mutableStateOf(true)
+
     val tabs = mutableStateListOf<TabItem>().also {
         it.add(TabItem(EnTexts.proxy, closable = false))
     }
@@ -106,7 +110,7 @@ fun MainScreen(viewModel: MainScreenViewModel = MainScreenViewModel()) = Window(
                                         onNewTab = { viewModel.addNewTab() }
                                     )
                                 }
-                                TabDataContent(state.currentTabState, onRowClick = { viewModel.onItemSelected(it) })
+                                TabDataContent(state.keepScrolledBottom, state.currentTabState, onRowClick = { viewModel.onItemSelected(it) })
                             }
                         },
                         bottom = {
@@ -133,6 +137,7 @@ fun MainScreen(viewModel: MainScreenViewModel = MainScreenViewModel()) = Window(
 @ExperimentalFoundationApi
 @Composable
 private fun TabDataContent(
+    keepScrolledBottom: Boolean,
     state: TabState,
     onRowClick: (Int) -> Unit
 ) {
@@ -140,9 +145,11 @@ private fun TabDataContent(
         modifier = Modifier.background(AppTheme.Colors.backgroundTabs.firstIfTrueElseSecond(true)),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        val dataScrollState = LazyListState(state.items.size - 1, 0)
+        val manualScrollState = remember(keepScrolledBottom) { LazyListState(Integer.MAX_VALUE) }
+        val keepBottomState = LazyListState(Integer.MAX_VALUE)
+        val scrollState = if (keepScrolledBottom) keepBottomState else manualScrollState
         LazyColumn(
-            state = dataScrollState,
+            state = scrollState,
             modifier = Modifier.weight(1f)
         ) {
             items(state.items.size) { index ->
@@ -153,12 +160,12 @@ private fun TabDataContent(
                     onClick = onRowClick,
                     modifier = Modifier
                         .background(
-                            AppTheme.Colors.colors.primaryVariant.takeIf { index == state.selectedRowIndex }
+                            AppTheme.Colors.colors.primary.takeIf { index == state.selectedRowIndex }
                                 ?: AppTheme.Colors.backgroundRows.firstOddElseSecond(index)
                         )
                 )
             }
         }
-        AppVerticalScrollbar(adapter = ScrollbarAdapter(dataScrollState, state.items.size, 20f))
+        AppVerticalScrollbar(adapter = rememberScrollbarAdapter(scrollState, state.items.size, 26.dp))
     }
 }
