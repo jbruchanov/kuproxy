@@ -36,6 +36,7 @@ import com.scurab.kuproxy.desktop.LocalTexts
 import com.scurab.kuproxy.desktop.Texts
 import com.scurab.kuproxy.desktop.components.AppVerticalScrollbar
 import com.scurab.kuproxy.desktop.components.HorizontalResizingContent
+import com.scurab.kuproxy.desktop.components.registerAsDropFileTarget
 import com.scurab.kuproxy.desktop.content.RequestRow
 import com.scurab.kuproxy.desktop.content.ResponseContent
 import com.scurab.kuproxy.desktop.content.TabsRow
@@ -81,15 +82,21 @@ data class TabItem(
     val state: TabState = TabState()
 )
 
-class TabState {
+class TabState() {
     val items = mutableStateListOf<RequestResponse>()
     var selectedRowIndex by mutableStateOf(-1)
+
+    constructor(collection: Collection<RequestResponse>) : this() {
+        items.addAll(collection)
+    }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 fun MainScreen(viewModel: MainScreenViewModel = MainScreenViewModel()) = Window(
     centered = false
 ) {
+    registerAsDropFileTarget { viewModel.onLoadFiles(it) }
+
     val state = viewModel.state
     AppTheme {
         Surface(modifier = Modifier.fillMaxSize()) {

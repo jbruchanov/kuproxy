@@ -116,7 +116,6 @@ fun TabButton(
             Text(
                 tab.name,
                 color = AppTheme.Colors.secondaryOnBackground.firstIfTrueElseSecond(selected),
-                fontWeight = AppTheme.TextStyles.boldNormal.firstIfTrueElseSecond(selected),
                 modifier = Modifier.defaultMinSize(minWidth = 100.dp)
             )
             if (tab.closable) {
