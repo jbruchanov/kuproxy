@@ -5,11 +5,17 @@ import com.scurab.kuproxy.KtorServer
 import com.scurab.kuproxy.ProxyConfig
 import com.scurab.kuproxy.ProxyServer
 import com.scurab.kuproxy.desktop.ext.ans
+import com.scurab.kuproxy.desktop.ext.mapCatching
 import com.scurab.kuproxy.processor.PassThroughProcessor
+import com.scurab.kuproxy.serialisation.TapeImportConverter
 import com.scurab.ssl.CertificateFactory
 import com.scurab.ssl.SslHelper
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.yaml.snakeyaml.Yaml
+import java.io.File
 
 class MainScreenViewModel {
     val state = MainWindowState()
@@ -63,9 +69,8 @@ class MainScreenViewModel {
         selectedRowIndex = -1
     }
 
-    fun onItemSelected(index: Int) = with(state.proxyTabState) {
-        selectedRowIndex = index
-            .inItemsRange()
+    fun onItemSelected(index: Int) = with(state.currentTabState) {
+        selectedRowIndex = index.inSelectedTabItemsRange()
     }
 
     fun onSettingsClicked() = with(state) {
@@ -113,8 +118,30 @@ class MainScreenViewModel {
     }
 
     private fun Int.inItemsRange() = coerceAtLeast(0).coerceAtMost(state.proxyTabState.items.size - 1)
+    private fun Int.inSelectedTabItemsRange() = coerceAtLeast(0).coerceAtMost(state.currentTabState.items.size - 1)
 
     fun onKeepScrolledBottomClicked() {
         state.keepScrolledBottom = !state.keepScrolledBottom
+    }
+
+    //TODO: DI
+    private val yaml = Yaml()
+    private val converter = TapeImportConverter()
+
+    fun onLoadFiles(files: List<File>) {
+        GlobalScope.launch {
+            files
+                .asSequence()
+                .filter { it.name.endsWith(".yaml") }
+                .mapCatching { it.inputStream().use { istream -> yaml.loadAs(istream, Map::class.java) as Map<String, Any> } }
+                .mapCatching { converter.convert(it) }
+                .let { tapes ->
+                    withContext(Dispatchers.Main) {
+                        tapes.forEach { tape ->
+                            state.tabs.add(TabItem(tape.name.ans, closable = true, checkable = true, TabState(tape.interactions)))
+                        }
+                    }
+                }
+        }
     }
 }
