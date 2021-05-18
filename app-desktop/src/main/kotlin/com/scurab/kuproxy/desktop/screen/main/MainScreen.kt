@@ -42,6 +42,7 @@ import com.scurab.kuproxy.desktop.content.ResponseContent
 import com.scurab.kuproxy.desktop.content.TabsRow
 import com.scurab.kuproxy.desktop.ext.firstIfTrueElseSecond
 import com.scurab.kuproxy.desktop.ext.firstOddElseSecond
+import com.scurab.kuproxy.model.TrackingEvent
 import com.scurab.kuproxy.storage.RequestResponse
 
 enum class Mode(
@@ -83,11 +84,11 @@ data class TabItem(
 )
 
 class TabState() {
-    val items = mutableStateListOf<RequestResponse>()
+    val items = mutableStateListOf<TrackingEvent>()
     var selectedRowIndex by mutableStateOf(-1)
 
     constructor(collection: Collection<RequestResponse>) : this() {
-        items.addAll(collection)
+        items.addAll(collection.map { TrackingEvent(it) })
     }
 }
 
@@ -163,7 +164,7 @@ private fun TabDataContent(
                 val item = state.items[index]
                 RequestRow(
                     index,
-                    item,
+                    item.requestResponse,
                     onClick = onRowClick,
                     modifier = Modifier
                         .background(

@@ -17,18 +17,19 @@ import com.scurab.kuproxy.comm.Headers.headerCharset
 import com.scurab.kuproxy.comm.Headers.isImageContent
 import com.scurab.kuproxy.comm.Headers.isTextContent
 import com.scurab.kuproxy.desktop.AppTheme
+import com.scurab.kuproxy.model.TrackingEvent
 import com.scurab.kuproxy.storage.RequestResponse
 import org.jetbrains.skija.Image as SkijaImage
 
 @Composable
-fun ResponseContent(item: RequestResponse) {
+fun ResponseContent(item: TrackingEvent) {
     SelectionContainer {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
         ) {
-            val (req, resp) = item
+            val (req, resp) = item.requestResponse
             Text("URL: ${req.url}")
             Text("Status: ${resp.status}")
             resp.headers.forEach { (key, value) ->

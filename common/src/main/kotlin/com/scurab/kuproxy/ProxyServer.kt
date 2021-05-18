@@ -1,10 +1,15 @@
 package com.scurab.kuproxy
 
+import com.scurab.kuproxy.comm.Request
+import com.scurab.kuproxy.comm.Response
+import com.scurab.kuproxy.comm.Url
 import com.scurab.kuproxy.ext.closeQuietly
 import com.scurab.kuproxy.ext.copyInto
 import com.scurab.kuproxy.ext.readUntil
 import com.scurab.kuproxy.ext.readUntilDoubleCrLf
 import com.scurab.kuproxy.ext.toDomainRegex
+import com.scurab.kuproxy.model.TrackingEvent
+import com.scurab.kuproxy.storage.RequestResponse
 import com.scurab.kuproxy.util.AnsiEffect
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -30,6 +35,7 @@ class ProxyServer(private val config: ProxyConfig) {
     private var isActive = false
     private val workingThreads = AtomicInteger()
     private val domains = config.domains.map { it.toDomainRegex() }
+    var trackingEventListener: ((TrackingEvent) -> Unit)? = null
 
     fun start() {
         if (socket != null) {
@@ -112,6 +118,17 @@ class ProxyServer(private val config: ProxyConfig) {
             with(clientSocket.getOutputStream()) {
                 write(SSL_OPENED)
                 flush()
+            }
+
+            if (!isProxying) {
+                trackingEventListener?.invoke(
+                    TrackingEvent(
+                        RequestResponse(
+                            Request(Url("https://${def.url}:${def.port}"), "---", emptyMap()),
+                            Response.EMPTY
+                        )
+                    )
+                )
             }
         }
 

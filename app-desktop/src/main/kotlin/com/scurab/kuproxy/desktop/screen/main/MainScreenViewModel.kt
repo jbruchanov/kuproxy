@@ -6,8 +6,10 @@ import com.scurab.kuproxy.ProxyConfig
 import com.scurab.kuproxy.ProxyServer
 import com.scurab.kuproxy.desktop.ext.ans
 import com.scurab.kuproxy.desktop.ext.mapCatching
+import com.scurab.kuproxy.model.TrackingEvent
 import com.scurab.kuproxy.processor.PassThroughProcessor
 import com.scurab.kuproxy.serialisation.TapeImportConverter
+import com.scurab.kuproxy.storage.RequestResponse
 import com.scurab.ssl.CertificateFactory
 import com.scurab.ssl.SslHelper
 import kotlinx.coroutines.Dispatchers
@@ -40,12 +42,8 @@ class MainScreenViewModel {
             keyAlias = SslHelper.ServerAlias
         }
 
-        val processor = PassThroughProcessor().apply {
-            callback = {
-                synchronized(state) {
-                    state.proxyTabState.items.add(it)
-                }
-            }
+        val processor = PassThroughProcessor().also {
+            it.requestResponseListener = this::onRequestResponse
         }
 
         ktorServer = KtorServer(ktorConfig, processor).also { it.start() }
@@ -54,7 +52,15 @@ class MainScreenViewModel {
             httpsServerPort = ktorConfig.httpsPort
             this.domains = config.domains
         }
-        proxyServer = ProxyServer(proxyConfig).also { it.start() }
+        proxyServer = ProxyServer(proxyConfig).also { it.start() }.also {
+            it.trackingEventListener = this::onRequestResponse
+        }
+    }
+
+    private fun onRequestResponse(item: TrackingEvent) {
+        synchronized(state) {
+            state.proxyTabState.items.add(item)
+        }
     }
 
     fun stop() {

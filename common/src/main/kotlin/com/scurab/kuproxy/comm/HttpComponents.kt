@@ -77,4 +77,8 @@ class Response(
     override fun toString(): String {
         return "Response(status=$status, headers=$headers, bodyLen=${body.size})"
     }
+
+    companion object {
+        val EMPTY = Response(-1, emptyMap(), ByteArray(0))
+    }
 }
