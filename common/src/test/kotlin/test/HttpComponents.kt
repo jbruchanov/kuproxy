@@ -31,6 +31,7 @@ class RequestBuilder : IRequest {
     override var method: String = "GET"
     override var headers: DomainHeaders = emptyMap()
     override var recorded: Long = System.currentTimeMillis()
+    override val body: ByteArray = ByteArray(0)
 }
 
 fun TestApplicationEngine.testRequest(
