@@ -146,6 +146,10 @@ class MainScreenViewModel {
                         tapes.forEach { tape ->
                             state.tabs.add(TabItem(tape.name, closable = true, checkable = true, TabState(tape.interactions)))
                         }
+                        //open it we have proxy && dropped in just 1 file
+                        if (state.selectedTab == state.tabs.first() && tapes.count() == 1) {
+                            state.selectedTab = state.tabs.last()
+                        }
                     }
                 }
         }
