@@ -2,19 +2,24 @@ package com.scurab.kuproxy.comm
 
 typealias DomainHeaders = Map<String, String>
 
-interface IRequest {
-    val url: Url
-    val method: String
-    val headers: DomainHeaders
-    val recorded: Long
-}
-
-interface IResponse {
-    val status: Int
+interface IRequestResponseCommon {
     val headers: DomainHeaders
     val body: ByteArray
 
     val notEmptyBody: ByteArray? get() = body.takeIf { it.isNotEmpty() }
+}
+
+interface IRequest : IRequestResponseCommon {
+    val url: Url
+    val method: String
+    override val headers: DomainHeaders
+    val recorded: Long
+}
+
+interface IResponse : IRequestResponseCommon {
+    val status: Int
+    override val headers: DomainHeaders
+    override val body: ByteArray
 }
 
 class Request(
@@ -23,6 +28,20 @@ class Request(
     override val headers: DomainHeaders,
     override val recorded: Long = System.currentTimeMillis()
 ) : IRequest {
+
+    //include body into equals ?
+    override var body: ByteArray = EMPTY
+        private set
+
+    constructor(
+        url: Url,
+        method: String,
+        headers: DomainHeaders,
+        body: ByteArray,
+        recorded: Long = System.currentTimeMillis()
+    ) : this(url, method, headers, recorded) {
+        this.body = body
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -46,6 +65,10 @@ class Request(
 
     override fun toString(): String {
         return "Request(url=$url, method='$method', headers=$headers, recorded=$recorded)"
+    }
+
+    companion object {
+        private val EMPTY = ByteArray(0)
     }
 }
 

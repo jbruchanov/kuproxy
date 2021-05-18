@@ -12,6 +12,8 @@ interface Texts {
     val passthrough: AnnotatedString
     val replay: AnnotatedString
     val record: AnnotatedString
+    val request: AnnotatedString
+    val response: AnnotatedString
 }
 
 object EnTexts : Texts {
@@ -23,4 +25,6 @@ object EnTexts : Texts {
     override val passthrough: AnnotatedString = "Passthrough".ans
     override val replay: AnnotatedString = "Replay".ans
     override val record: AnnotatedString = "Record".ans
+    override val request: AnnotatedString = "Request".ans
+    override val response: AnnotatedString = "Response".ans
 }

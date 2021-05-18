@@ -4,12 +4,11 @@ import com.scurab.kuproxy.KtorConfig
 import com.scurab.kuproxy.KtorServer
 import com.scurab.kuproxy.ProxyConfig
 import com.scurab.kuproxy.ProxyServer
-import com.scurab.kuproxy.desktop.ext.ans
+import com.scurab.kuproxy.desktop.content.ContentType
 import com.scurab.kuproxy.desktop.ext.mapCatching
 import com.scurab.kuproxy.model.TrackingEvent
 import com.scurab.kuproxy.processor.PassThroughProcessor
 import com.scurab.kuproxy.serialisation.TapeImportConverter
-import com.scurab.kuproxy.storage.RequestResponse
 import com.scurab.ssl.CertificateFactory
 import com.scurab.ssl.SslHelper
 import kotlinx.coroutines.Dispatchers
@@ -22,7 +21,7 @@ import java.io.File
 class MainScreenViewModel {
     val state = MainWindowState()
     var config: ProxyConfig = ProxyConfig {
-        domains = listOf("cdr.cz", "*.cdr.cz")
+        domains = listOf("*.cdr.cz", "cdr.cz")
     }
         private set
 
@@ -53,7 +52,8 @@ class MainScreenViewModel {
             this.domains = config.domains
         }
         proxyServer = ProxyServer(proxyConfig).also { it.start() }.also {
-            it.trackingEventListener = this::onRequestResponse
+            //ignore untracked domains
+            //it.trackingEventListener = this::onRequestResponse
         }
     }
 
@@ -110,7 +110,7 @@ class MainScreenViewModel {
     private var newTabCounter = 1
 
     fun addNewTab() {
-        val newTab = TabItem("New-$newTabCounter".ans, closable = true, checkable = true, TabState())
+        val newTab = TabItem("New-$newTabCounter", closable = true, checkable = true, TabState())
         state.tabs.add(newTab)
         if (state.checkedTab == null) {
             state.checkedTab = newTab
@@ -144,10 +144,14 @@ class MainScreenViewModel {
                 .let { tapes ->
                     withContext(Dispatchers.Main) {
                         tapes.forEach { tape ->
-                            state.tabs.add(TabItem(tape.name.ans, closable = true, checkable = true, TabState(tape.interactions)))
+                            state.tabs.add(TabItem(tape.name, closable = true, checkable = true, TabState(tape.interactions)))
                         }
                     }
                 }
         }
+    }
+
+    fun onContentTypeClicked(type: ContentType) {
+        state.currentTabState.selectedContentType = type
     }
 }

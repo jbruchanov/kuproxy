@@ -90,13 +90,52 @@ fun TabButton(
     onCheck: (TabItem) -> Unit = {},
     onClose: (TabItem) -> Unit = {},
 ) {
+    TabButton(
+        name = tab.name,
+        checkable = tab.checkable,
+        closable = tab.closable,
+        selected = selected,
+        checked = checked,
+        onClick = { onClick(tab) },
+        onCheck = { onCheck(tab) },
+        onClose = { onClose(tab) }
+    )
+}
+
+@Composable
+fun SimpleTabButton(
+    name: String,
+    selected: Boolean,
+    onClick: (String) -> Unit
+) {
+    TabButton(
+        name = name,
+        checkable = false,
+        closable = false,
+        selected = selected,
+        checked = false,
+        onClick = onClick
+    )
+}
+
+@Composable
+fun TabButton(
+    name: String,
+    checkable: Boolean,
+    closable: Boolean,
+    selected: Boolean,
+    checked: Boolean,
+    onClick: (String) -> Unit,
+    onCheck: (String) -> Unit = {},
+    onClose: (String) -> Unit = {},
+) {
     Box(
         modifier = Modifier
             .background(AppTheme.Colors.backgroundTabs.firstIfTrueElseSecond(selected))
             .width(IntrinsicSize.Max)
             .height(IntrinsicSize.Max)
             .defaultMinButtonSize()
-            .clickable { onClick(tab) },
+            .clickable { onClick(name) },
         contentAlignment = Alignment.Center
     ) {
         Row(
@@ -106,24 +145,24 @@ fun TabButton(
                 .fillMaxHeight()
                 .padding(horizontal = AppTheme.Spacing.step)
         ) {
-            if (tab.checkable) {
+            if (checkable) {
                 Checkbox(
-                    checked, onCheckedChange = { onCheck(tab) },
+                    checked, onCheckedChange = { onCheck(name) },
                     modifier = Modifier.padding(horizontal = AppTheme.Spacing.step_0_5)
                 )
             }
             Spacer(modifier = Modifier.width(AppTheme.Spacing.step))
             Text(
-                tab.name,
+                name,
                 color = AppTheme.Colors.secondaryOnBackground.firstIfTrueElseSecond(selected),
                 modifier = Modifier.defaultMinSize(minWidth = 100.dp)
             )
-            if (tab.closable) {
+            if (closable) {
                 Spacer(modifier = Modifier.width(AppTheme.Spacing.step))
                 Box(
                     modifier = Modifier
                         .clip(CircleShape)
-                        .clickable(onClick = { onClose(tab) })
+                        .clickable(onClick = { onClose(name) })
                         .padding(AppTheme.Spacing.step_0_5)
                 ) {
                     Icon(Icons.Filled.Close, contentDescription = null, modifier = Modifier.defaultTabIconSize())
@@ -135,7 +174,7 @@ fun TabButton(
                 .fillMaxWidth()
                 .height(AppTheme.Sizes.divider)
                 .background(color = AppTheme.Colors.primaryTransparent.firstIfTrueElseSecond(selected))
-                .align(Alignment.BottomStart)
+                .align(Alignment.TopStart)
 
         )
     }

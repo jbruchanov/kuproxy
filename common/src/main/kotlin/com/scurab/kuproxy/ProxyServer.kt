@@ -156,6 +156,7 @@ class ProxyServer(private val config: ProxyConfig) {
         }
         return Socket().also {
             it.connect(InetSocketAddress(url, port), 2000)
+            //TODO: disable the timeout (gmail is trying to keep this connection online)
             it.soTimeout = 2000
         }
     }
