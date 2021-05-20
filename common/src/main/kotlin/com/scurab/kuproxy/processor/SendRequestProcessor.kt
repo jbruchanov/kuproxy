@@ -7,6 +7,7 @@ import com.scurab.kuproxy.comm.Response
 import com.scurab.kuproxy.common.BuildConfig
 import com.scurab.kuproxy.ext.respond
 import com.scurab.kuproxy.ext.toDomainHeaders
+import com.scurab.kuproxy.model.TrackingEvent
 import com.scurab.kuproxy.storage.RequestResponse
 import io.ktor.application.ApplicationCall
 import io.ktor.client.HttpClient
@@ -25,14 +26,14 @@ typealias ProcessingCallback = ApplicationCall.() -> Unit
 interface SendRequestProcessor {
     suspend fun send(call: ApplicationCall, request: IRequest): IResponse
 
-    var callback: ((RequestResponse) -> Unit)?
+    var requestResponseListener: ((TrackingEvent) -> Unit)?
 
     class Impl(
         private val client: HttpClient,
         private val customHandler: ProcessingCallback? = null
     ) : SendRequestProcessor {
 
-        override var callback: ((RequestResponse) -> Unit)? = null
+        override var requestResponseListener: ((TrackingEvent) -> Unit)? = null
 
         override suspend fun send(call: ApplicationCall, request: IRequest): IResponse {
             val requestBody = call.receiveStream().readBytes()
@@ -71,7 +72,7 @@ interface SendRequestProcessor {
                 customHandler?.invoke(this)
                 AddKuProxyInfoHeader(this)
             }
-            callback?.invoke(RequestResponse(request, domainResponse))
+            requestResponseListener?.invoke(TrackingEvent(RequestResponse(request, domainResponse)))
 
             return domainResponse
         }

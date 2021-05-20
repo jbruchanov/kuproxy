@@ -37,11 +37,14 @@ import com.scurab.kuproxy.desktop.Texts
 import com.scurab.kuproxy.desktop.components.AppVerticalScrollbar
 import com.scurab.kuproxy.desktop.components.HorizontalResizingContent
 import com.scurab.kuproxy.desktop.components.registerAsDropFileTarget
+import com.scurab.kuproxy.desktop.content.BodyContent
+import com.scurab.kuproxy.desktop.content.ContentType
 import com.scurab.kuproxy.desktop.content.RequestRow
-import com.scurab.kuproxy.desktop.content.ResponseContent
+import com.scurab.kuproxy.desktop.content.SimpleTabButton
 import com.scurab.kuproxy.desktop.content.TabsRow
 import com.scurab.kuproxy.desktop.ext.firstIfTrueElseSecond
 import com.scurab.kuproxy.desktop.ext.firstOddElseSecond
+import com.scurab.kuproxy.model.TrackingEvent
 import com.scurab.kuproxy.storage.RequestResponse
 
 enum class Mode(
@@ -62,7 +65,7 @@ class MainWindowState {
     var keepScrolledBottom by mutableStateOf(true)
 
     val tabs = mutableStateListOf<TabItem>().also {
-        it.add(TabItem(EnTexts.proxy, closable = false))
+        it.add(TabItem(EnTexts.proxy.toString(), closable = false))
     }
     var isConfigVisible by mutableStateOf(false)
     var selectedTab by mutableStateOf(tabs.first())
@@ -76,18 +79,19 @@ class MainWindowState {
 }
 
 data class TabItem(
-    val name: AnnotatedString,
+    val name: String,
     val closable: Boolean = false,
     val checkable: Boolean = false,
     val state: TabState = TabState()
 )
 
 class TabState() {
-    val items = mutableStateListOf<RequestResponse>()
+    val items = mutableStateListOf<TrackingEvent>()
     var selectedRowIndex by mutableStateOf(-1)
+    var selectedContentType by mutableStateOf(ContentType.Response)
 
     constructor(collection: Collection<RequestResponse>) : this() {
-        items.addAll(collection)
+        items.addAll(collection.map { TrackingEvent(it) })
     }
 }
 
@@ -121,13 +125,39 @@ fun MainScreen(viewModel: MainScreenViewModel = MainScreenViewModel()) = Window(
                             }
                         },
                         bottom = {
-                            Box(modifier = Modifier.padding(AppTheme.Spacing.step).fillMaxSize()) {
-                                val tabState = state.currentTabState
-                                tabState.selectedRowIndex
-                                    .takeIf { it != -1 }
-                                    ?.let {
-                                        ResponseContent(tabState.items[it])
-                                    }
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                            ) {
+                                val texts = LocalTexts.current
+                                Row {
+                                    SimpleTabButton(
+                                        texts.request.toString(),
+                                        selected = state.currentTabState.selectedContentType == ContentType.Request,
+                                        onClick = { viewModel.onContentTypeClicked(ContentType.Request) }
+                                    )
+
+                                    SimpleTabButton(
+                                        texts.response.toString(),
+                                        state.currentTabState.selectedContentType == ContentType.Response,
+                                        onClick = { viewModel.onContentTypeClicked(ContentType.Response) }
+                                    )
+                                }
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(AppTheme.Colors.backgroundTabs.firstIfTrueElseSecond(true))
+                                ) {
+                                    val tabState = state.currentTabState
+                                    tabState.selectedRowIndex
+                                        .takeIf { it != -1 }
+                                        ?.let {
+                                            BodyContent(
+                                                tabState.items[it],
+                                                state.currentTabState.selectedContentType,
+                                                Modifier.padding(AppTheme.Spacing.step)
+                                            )
+                                        }
+                                }
                             }
                         }
                     )
@@ -163,7 +193,7 @@ private fun TabDataContent(
                 val item = state.items[index]
                 RequestRow(
                     index,
-                    item,
+                    item.requestResponse,
                     onClick = onRowClick,
                     modifier = Modifier
                         .background(

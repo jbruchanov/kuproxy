@@ -32,7 +32,7 @@ fun RequestRow(index: Int, item: RequestResponse, onClick: (Int) -> Unit, modifi
     ) {
         val (req, resp) = item
         Spacer(modifier.width(AppTheme.Spacing.step_0_25))
-        Text(resp.status.toString())
+        Text(resp.status.takeIf { it > 0 }?.toString() ?: "---")
         Text(req.method, modifier.defaultMinSize(AppTheme.Spacing.step_4), textAlign = TextAlign.Center)
         Text(req.url.host, fontWeight = FontWeight.Bold)
         Text(
